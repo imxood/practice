@@ -459,96 +459,157 @@ echo "INPUT(-lncursesw)" > /usr/lib/libcursesw.so
 ln -sfv libncurses.so      /usr/lib/libcurses.so
 mkdir -v       /usr/share/doc/ncurses-6.1
 cp -v -R doc/* /usr/share/doc/ncurses-6.1
+make distclean
+./configure --prefix=/usr    \
+            --with-shared    \
+            --without-normal \
+            --without-debug  \
+            --without-cxx-binding \
+            --with-abi-version=5
+make sources libs
+cp -av lib/lib*.so.5* /usr/lib
 
 
-#
+# Attr-2.4.48
+cd $LFS/sources
+extract_dir attr-2.4.48.tar.gz
+./configure --prefix=/usr     \
+            --bindir=/bin     \
+            --disable-static  \
+            --sysconfdir=/etc \
+            --docdir=/usr/share/doc/attr-2.4.48
+make -j12
+make check
+make install
+mv -v /usr/lib/libattr.so.* /lib
+ln -sfv ../../lib/$(readlink /usr/lib/libattr.so) /usr/lib/libattr.so
+
+# Acl-2.2.53
+cd $LFS/sources
+extract_dir
+./configure --prefix=/usr         \
+            --bindir=/bin         \
+            --disable-static      \
+            --libexecdir=/usr/lib \
+            --docdir=/usr/share/doc/acl-2.2.53
+make -j12
+make install
+mv -v /usr/lib/libacl.so.* /lib
+ln -sfv ../../lib/$(readlink /usr/lib/libacl.so) /usr/lib/libacl.so
+
+
+# Libcap-2.26
+cd $LFS/sources
+extract_dir
+sed -i '/install.*STALIBNAME/d' libcap/Makefile
+make -j12
+make RAISE_SETFCAP=no lib=lib prefix=/usr install
+chmod -v 755 /usr/lib/libcap.so.2.26
+mv -v /usr/lib/libcap.so.* /lib
+ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
+
+
+# Sed-4.7
+cd $LFS/sources
+extract_dir
+sed -i 's/usr/tools/'                 build-aux/help2man
+sed -i 's/testsuite.panic-tests.sh//' Makefile.in
+./configure --prefix=/usr --bindir=/bin
+make -j12
+make html -j12
+make check
+make install
+install -d -m755           /usr/share/doc/sed-4.7
+install -m644 doc/sed.html /usr/share/doc/sed-4.7
+
+
+# Psmisc-23.2
+cd $LFS/sources
+extract_dir
+./configure --prefix=/usr
+make -j12
+make install
+mv -v /usr/bin/fuser   /bin
+mv -v /usr/bin/killall /bin
+
+
+# Iana-Etc-2.30
 cd $LFS/sources
 extract_dir
 make -j12
 make install
 
 
-#
+# Bison-3.3.2
 cd $LFS/sources
 extract_dir
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.3.2
 make -j12
 make install
 
 
-#
+# Flex-2.6.4
 cd $LFS/sources
 extract_dir
+sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+HELP2MAN=/tools/bin/true \
+./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4
 make -j12
+make check
+make install
+ln -sv flex /usr/bin/lex
+
+
+# Grep-3.3
+cd $LFS/sources
+extract_dir
+./configure --prefix=/usr --bindir=/bin
+make -j12
+make -k check
 make install
 
 
-#
+# Bash-5.0
 cd $LFS/sources
 extract_dir
+./configure --prefix=/usr                    \
+            --docdir=/usr/share/doc/bash-5.0 \
+            --without-bash-malloc            \
+            --with-installed-readline
 make -j12
+chown -Rv nobody .
+su nobody -s /bin/bash -c "PATH=$PATH HOME=/home make tests"
+make install
+mv -vf /usr/bin/bash /bin
+exec /bin/bash --login +h
+
+
+# Libtool-2.4.6
+cd $LFS/sources
+extract_dir
+./configure --prefix=/usr
+make -j12
+make check
 make install
 
 
-#
+# GDBM-1.18.1
 cd $LFS/sources
 extract_dir
+./configure --prefix=/usr    \
+            --disable-static \
+            --enable-libgdbm-compat
 make -j12
+make check
 make install
 
 
-#
+# Gperf-3.1
 cd $LFS/sources
 extract_dir
+./configure --prefix=/usr --docdir=/usr/share/doc/gperf-3.1
 make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
-make install
-
-
-#
-cd $LFS/sources
-extract_dir
-make -j12
+make -j1 check
 make install
 
 

@@ -4,13 +4,22 @@
 sudo apt install -y grub-pc
 
 # 安装编译linux的必要依赖
-sudo apt install libncurses5-dev gcc make git exuberant-ctags bc libssl-dev
+sudo apt install libncurses5-dev gcc make git exuberant-ctags bc libssl-dev grub-pc
 
 # 创建一个空的磁盘文件
 dd if=/dev/zero of=disk.img bs=1M count=1024
 
 # 对磁盘文件分区
-fdisk disk.img
+echo "
+n
+p
+
+
+
+w
+" | fdisk disk.img
+
+
 
 # 把磁盘文件关联到/dev/loop7设备上
 sudo losetup -o 1048576 /dev/loop7 disk.img
