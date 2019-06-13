@@ -2,17 +2,17 @@
 name = "pypi"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 verify_ssl = true
-# PIPENV_IGNORE_VIRTUALENVS = 1
-# PIPENV_VERBOSITY = 3
 
 [dev-packages]
 pylint = "*"
+autopep8 = "*"
 
 [packages]
 flask-dramatiq = "*"
 flask = "*"
 dramatiq = {extras = ["rabbitmq", "redis", "watch"],version = "*"}
 requests = "*"
+flask-restful = "*"
 
 [requires]
 python_version = "3.7"
