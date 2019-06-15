@@ -1,14 +1,14 @@
 from flask import Flask
 from flask_dramatiq import Dramatiq
 
-app = Flask(__name__)
-app.debug = True
+Dramatiq.DEFAULT_BROKER = "dramatiq.brokers.redis:RedisBroker"
 
+app = Flask(__name__)
 dramatiq = Dramatiq(app)
 
 @dramatiq.actor()
 def my_actor():
-    print("hello")
+    print("run task")
 
 @app.route("/")
 def myhandler():
