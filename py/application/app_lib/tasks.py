@@ -56,3 +56,16 @@ def task_1():
     pipe = hello_task.message() | world_task.message()
     pipe.get_result(block=True)
     log.info("Hello, I'm Task_1")
+
+
+@dramatiq.actor
+def task_start_file_service():
+    pass
+
+@dramatiq.actor
+def task_end_file_service():
+    pass
+
+@dramatiq.actor
+def task_wait_file_service_complete():
+    pass

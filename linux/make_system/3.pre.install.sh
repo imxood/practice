@@ -159,7 +159,7 @@ install uhci_hcd /sbin/modprobe ehci_hcd ; /sbin/modprobe -i uhci_hcd ; true
 EOF
 
 # Using GRUB to Set Up the Boot Process
-grub-install /dev/sda
+grub-install --target=i386-pc /dev/sdc
 
 cat > /boot/grub/grub.cfg << "EOF"
 # Begin /boot/grub/grub.cfg
@@ -168,7 +168,7 @@ set timeout=50
 insmod ext2
 set root=(hd0,msdos3)
 menuentry "GNU/Linux, Linux 4.9.9-lfs-8.0" {
-linux /vmlinuz-4.9.9-lfs-8.0 root=/dev/sda1 ro
+linux /vmlinuz-4.9.9-lfs-8.0 root=/dev/sdc1 ro
 }
 EOF
 

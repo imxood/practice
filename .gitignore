@@ -5,3 +5,7 @@ __pycache__
 .vscode
 .venv
 Pipfile.lock
+disk.img
+linux-4.*
+mnt
+initrd
