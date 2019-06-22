@@ -25,9 +25,6 @@ pacman -S vim
 pacman -S bash-completion
 . /etc/bash.bashrc
 
-pacman -S networkmanager
-systemctl enable NetworkManager.service
-
 # en_US.UTF-8 UTF-8
 # zh_CN.UTF-8 UTF-8
 vim /etc/locale.gen
@@ -78,5 +75,31 @@ vim /etc/lightdm/lightdm.conf
 
 # kde desktop
 pacman -S plasma-desktop kdebase
+
+# audio
+pacman -S alsa-utils pulseaudio pulseaudio-alsa
+
+# net
+pacman -S net-tools networkmanager plasma-nm
+systemctl enable NetworkManager.service
+
+# Color
+vim /etc/pacman.conf
+
+# theme
+pacman -S arc-kde
+
+# icon
+pacman -S papirus-icon-theme
+
+# brower
+pacman -S google-chrome
+
+# image view tool
+pacman -S gwenview
+
+# proxy
+pacman -S v2ray
+systemctl enable v2ray.service
 
 exit
