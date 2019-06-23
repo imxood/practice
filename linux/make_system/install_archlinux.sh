@@ -9,6 +9,7 @@ lsblk
 # mount point: /mnt /mnt/boot /mnt/home
 # ...
 
+# pacman -S arch-install-scripts
 sudo pacstrap /mnt base base-devel
 
 # need to check the fstab's correctness
@@ -16,11 +17,26 @@ sudo genfstab -U /mnt | sudo tee /mnt/etc/fstab
 
 sudo arch-chroot /mnt
 
+# timedatectl set-timezone Asia/Shanghai
 ls -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
+# timedatectl set-ntp true
 hwclock --systohc
 
-pacman -S vim
+cat - > /etc/pacman.conf << eof
+[archlinuxcn]
+SigLevel = Optional TrustAll
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/\$arch
+eof
+
+# ## China
+# Server = http://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
+nano /etc/pacman.d/mirrorlist
+
+pacman -Sy archlinuxcn-keyring
+
+pacman -S vim yay
+
 
 pacman -S bash-completion
 . /etc/bash.bashrc
@@ -31,8 +47,11 @@ vim /etc/locale.gen
 
 locale-gen
 
+
+# localectl set-locale LANG=en_US.UTF-8
 echo 'LANG=en_US.UTF-8' > /etc/locale.cfg
 
+# hostnamectl set-hostname maxu-pc
 echo 'YourPcName' > /etc/hostname
 
 cat - > /etc/hosts << eof
@@ -41,9 +60,9 @@ cat - > /etc/hosts << eof
 127.0.0.1       maxu-pc.localdomain maxu-pc
 eof
 
-pacman -S grub efibootmgr
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchLinux --boot-directory=/boot --debug
-
+pacman -S grub os-prober efibootmgr
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --boot-directory=/boot --bootloader-id=ArchLinux --debug
+grub-mkconfig -o /boot/grub/grub.cfg
 passwd
 
 # add new user
@@ -54,11 +73,10 @@ passwd UserName
 visudo
 
 # Chinese font
-pacman -S ttf-dejavu ttf-liberation wqy-microhei
+pacman -S ttf-dejavu ttf-liberation wqy-zenhei wqy-microhei
 
-# install desktop
-
-pacman -S xorg-server
+# install xorg-server
+pacman -S xorg-server xorg-server-utils xorg-xinit
 
 # video driver
 pacman -S xf86-video-intel nvidia
@@ -73,33 +91,92 @@ systemctl enable lightdm.service
 # add greeter-session=lightdm-gtk-greeter
 vim /etc/lightdm/lightdm.conf
 
-# kde desktop
-pacman -S plasma-desktop kdebase
-
 # audio
-pacman -S alsa-utils pulseaudio pulseaudio-alsa
+pacman -S pulseaudio pulseaudio-alsa alsa-utils
 
 # net
-pacman -S net-tools networkmanager plasma-nm
+pacman -S net-tools networkmanager
 systemctl enable NetworkManager.service
+
+# wifi
+pacman -S wpa_supplicant dialog
+
+# uncompress
+pacman -S p7zip file-roller unrar
+
+# ntfs
+pacman -S ntfs-3g dosfstools
+
+# ap
+pacman -S create_ap
 
 # Color
 vim /etc/pacman.conf
 
-# theme
-pacman -S arc-kde
+# desktop
+pasman -S xfce4 xfce4-goodies
 
-# icon
-pacman -S papirus-icon-theme
+# icon theme
+yay -S numix-circle-icon-theme-git
+
+# gtk theme
+yay -S gtk-theme-arc-git
+
+# https://www.xfce-look.org
+
+mkdir ~/.themes
+
+# XFWM4 Themes
+# Greybird-yosemite-v2.zip
+# XFCE Settings --> Window Manager --> select "Greybird-yosemite"
+mv Greybird-yosemite ~/.themes
+
+
+# mouse wheel
+# Open Window Manager Tweaks
+#       --> Accessibility
+#               --> untick "Use mouse wheel on title bar to roll up the window"
+#       --> Workspace
+#               --> untick "Use mouse wheel on the desktop to switch workspaces"
+
 
 # brower
 pacman -S google-chrome
 
-# image view tool
-pacman -S gwenview
-
 # proxy
 pacman -S v2ray
 systemctl enable v2ray.service
+
+# pinyin
+pacman -S fcitx fcitx-configtool fcitx-googlepinyin
+
+cat - > ~/.xprofile << eof
+export LC_CTYPE=zh_CN.UTF-8
+export XIM=fcitx  
+export XIM_PROGRAM=fcitx
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+eof
+
+
+
+
+# # kde desktop
+# pacman -S plasma-desktop kdebase
+
+# # theme
+# pacman -S arc-kde
+
+# # icon
+# pacman -S papirus-icon-theme
+
+# # image view tool
+# pacman -S gwenview
+
+
+# pacman -S xf86-video-vmware
+# pacman -S open-vm-tools
+# systemctl enable vmtoolsd.service
 
 exit

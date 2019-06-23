@@ -9,3 +9,4 @@ disk.img
 linux-4.*
 mnt
 initrd
+.backup

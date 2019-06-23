@@ -21,6 +21,8 @@ dd if=/dev/zero of=disk.img bs=1M count=20480
 # 对磁盘文件分区
 # 1. esp(512M) 2. swap(4G) 3. /(10G) 4. /home(Other)
 echo "
+o
+y
 n
 
 
