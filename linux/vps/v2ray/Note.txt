@@ -1,0 +1,3 @@
+https://veekxt.com/utils/v2ray_gen
+
+sudo -H pip3 install v2ray-util

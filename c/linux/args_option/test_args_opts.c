@@ -1,78 +1,63 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <getopt.h>
 
-static int enable_add = 0;
-
-/**
- * --add
- * --multiply ARG1, or, --multiply=ARG1
- * --subtract, or, --subtract ARG2
- */
-
-static struct option long_options[] = {
-	{"add", no_argument, &enable_add, 1},
-	{"multiply", required_argument, NULL, 2},
-	{"subtract", optional_argument, NULL, 3}
-};
-
-/**
- * -a
- * -m 10
- * -s or -s10, Note: no space!
- */
-const char* short_options = "am:s::";
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
+	const char *short_options = "vhVo:";
 
-	int option_index = 0;
-	int opt;
+	const struct option long_options[] = {
+		{"verbose", optional_argument, NULL, 'v'},
+		{"help", no_argument, NULL, 'h'},
+		{"version", no_argument, NULL, 'V'},
+		{"output", optional_argument, NULL, 'o'},
+		{NULL, 0, NULL, 0}, /*Require daten do farray.*/
+	};
 
-	while((opt = getopt_long(argc, argv, short_options, long_options, &option_index)) != -1) {
-		switch (opt) {
-			case 0:
-				printf("long option: --add");
-				printf("\n\n");
-				break;
+	const usage = 	"-s SPEED               | --speed SPEED \n"
+					"-m MODE                | --mode MODE \n"
+					"-b BAUDRATE            | --baudrate BAUDRATE \n"
+					"-f FRAME-DELAY-TIME_MS | --frame-delay FRAME-DELAY-TIME_MS \n"
+					"-l LOOP_COUNT          | --loop LOOP_COUNT \n";
 
-			case 1:
-				printf("long option: --multiply");
-				if (optarg != NULL) {
-					printf(" %s", optarg);
-				}
-				printf("\n\n");
-				break;
+	int c;
 
-			case 2:
-				printf("long option: --subtract");
-				if (optarg != NULL) {
-					printf(" %s", optarg);
-				}
-				printf("\n\n");
-				break;
+	for (;;)
+	{
+		c = getopt_long(argc, argv, short_options, long_options, NULL);
+		if (c == -1)
+		{
+			break;
+		}
+		switch (c)
+		{
+		case 'h':
+			printf(usage);
+			exit(0);
 
-			case 'a':
-				printf("short option: -a\n\n");
-				break;
+		case 'v':
+			printf("set the program's log verbose...\n");
+			break;
 
-			case 'm':
-				printf("short option: -m %s\n\n", optarg);
-				break;
+		case 'V':
+			printf("The version is 0.1...\n");
+			break;
 
-			case 's':
-				printf("short option: -s");
-				if (optarg != NULL) {
-					printf(" %s", optarg);
-				}
-				printf("\n\n");
-				break;
+		case 'o':
+			printf("The output file is %s.\n", optarg);
+			break;
+
+		case '?':
+			printf("Invalid option, abort the program.");
+			exit(-1);
+
+		default: //unexpected
+			abort();
 		}
 	}
 
-	if (opt == -1) {
-		printf("getopt_long return -1\n\n");
-		return 0;
-	}
+	printf("ret: %d\n", c);
 
 	return 0;
 }
