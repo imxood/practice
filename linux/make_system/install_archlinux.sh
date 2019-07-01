@@ -31,11 +31,25 @@ eof
 
 # ## China
 # Server = http://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
+
 nano /etc/pacman.d/mirrorlist
 
 pacman -Sy archlinuxcn-keyring
 
-pacman -S vim yay
+pacman -S vim yay aria2c mirrorlist-rankmirrors-hook
+
+wget -O /etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/all/
+#或是
+wget -O /etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=CN
+
+cp mirrorlist mirrorlist.backup
+
+rankmirrors -n 0 mirrorlist.backup | sudo tee mirrorlist
+
+pacman -Syy
+
+XferCommand = /usr/bin/aria2c --allow-overwrite=true -c --file-allocation=none --log-level=info -m2 --max-connection-per-server=10 --max-file-not-found=5 --min-split-size=1M --no-conf --remote-time=true --summary-interval=10 -t5 -d / -o %o %u
+#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
 
 
 pacman -S bash-completion
@@ -99,7 +113,7 @@ pacman -S net-tools networkmanager
 systemctl enable NetworkManager.service
 
 # wifi
-pacman -S wpa_supplicant dialog
+pacman -S iw wpa_supplicant dialog wireless_tools
 
 # uncompress
 pacman -S p7zip file-roller unrar
@@ -160,7 +174,9 @@ export XMODIFIERS="@im=fcitx"
 eof
 
 
-
+# libreioffice
+# sudo pacman -S libreoffice-still
+sudo pacman -S libreoffice-fresh
 
 # # kde desktop
 # pacman -S plasma-desktop kdebase
