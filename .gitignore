@@ -10,3 +10,4 @@ linux-4.*
 mnt
 initrd
 .backup
+output*
