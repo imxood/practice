@@ -92,7 +92,7 @@ pacman -S ttf-dejavu ttf-liberation wqy-zenhei wqy-microhei
 # install xorg-server
 pacman -S xorg-server xorg-server-utils xorg-xinit
 
-# video driver
+# video driver ? mhwd-nvidia
 pacman -S xf86-video-intel nvidia
 
 # input device
