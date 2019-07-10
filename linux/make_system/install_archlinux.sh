@@ -63,7 +63,7 @@ locale-gen
 
 
 # localectl set-locale LANG=en_US.UTF-8
-echo 'LANG=en_US.UTF-8' > /etc/locale.cfg
+/echo 'LANG=en_US.UTF-8' > /etc/locale.cfg
 
 # hostnamectl set-hostname maxu-pc
 echo 'YourPcName' > /etc/hostname
@@ -76,6 +76,9 @@ eof
 
 pacman -S grub os-prober efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --boot-directory=/boot --bootloader-id=ArchLinux --debug
+
+# grub-install --target=x86_64-efi --efi-directory=/mnt/boot --boot-directory=/mnt/boot --bootloader-id=ubuntu-kylin --debug
+
 grub-mkconfig -o /boot/grub/grub.cfg
 passwd
 

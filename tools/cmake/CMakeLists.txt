@@ -5,6 +5,7 @@ include(CMakeParseArguments)
 include(test_cmake.cmake)
 
 
+##############
 
 set(CMAKE_C_COMPILER "/home/mx/work/ose_fw_lastest/ose-dev-code-base/modules/ose_val_baremetal/BullseyeCoverage/bin/arm-zephyr-eabi-gcc")
 set(TOOLCHAIN_C_FLAGS "-mthumb;-mcpu=cortex-m7;-mfpu=fpv5-sp-d16;-mfloat-abi=hard")
@@ -14,6 +15,8 @@ execute_process(
 	OUTPUT_VARIABLE LIBGCC_FILE_NAME
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+
 
 # function(tst_arguments)
 
@@ -60,16 +63,17 @@ execute_process(
 # check_module()
 
 
+##############
+
 function(test_source_add src_list)
 
 	message("ARGC: ${ARGC}")
 	message("ARGC: ${ARGV}")
-	
+
 	file(GLOB_RECURSE FILES ${ARGV})
 	message("FILES = ${FILES}")
 
 endfunction()
-
 
 function(test_source_add_if condition src_list)
 
@@ -85,10 +89,40 @@ function(test_source_add_if condition src_list)
 
 endfunction()
 
-
 set(CONFIG_TEST ON)
 
 test_source_add(build.sh)
 
 test_source_add_if(CONFIG_TEST build.sh CMakeLists.txt)
 
+
+
+##############
+
+find_program(DTC dtc)
+
+message("DTC: ${DTC}")
+
+if(${DTC} STREQUAL DTC-NOTFOUND)
+	message(FATAL_ERROR "Unable to find dtc")
+endif()
+
+set(MIN_DTC_VERSION 1.4.6)
+execute_process(
+	COMMAND
+	${DTC} --version
+	OUTPUT_VARIABLE dtc_version_output
+)
+
+message("dtc_version_output: ${dtc_version_output}")
+
+string(REGEX MATCH "Version: DTC ([0-9]+\.[0-9]+.[0-9]+).*" out_var ${dtc_version_output})
+
+if(${CMAKE_MATCH_1} VERSION_LESS ${MIN_DTC_VERSION})
+	assert(0 "The detected dtc version is unsupported.                                 \n\
+		The version was found to be ${CMAKE_MATCH_1}                                   \n\
+		But the minimum supported version is ${MIN_DTC_VERSION}                        \n\
+		See https://docs.zephyrproject.org/latest/getting_started/                     \n\
+		for how to use the SDK's dtc alongside a custom toolchain."
+	)
+endif()

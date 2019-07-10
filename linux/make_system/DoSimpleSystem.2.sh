@@ -1,5 +1,30 @@
 #!/bin/bash
 
+mkdir /mnt/chrootdir
+
+
+mount /dev/sda1 /mnt/chrootdir
+
+
+for dir in proc dev sys etc bin sbin var usr lib lib64 tmp; do
+
+
+ mkdir /mnt/chrootdir/$dir && mount --bind /$dir /mnt/chrootdir/$dir
+
+
+done
+
+
+chroot /mnt/chrootdir
+
+
+update-grub2 # inside chroot
+
+
+
+
+
+
 # 引导程序
 sudo apt install -y grub-efi
 
