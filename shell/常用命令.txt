@@ -1,0 +1,11 @@
+查看某个库是否存在
+
+ldconfig -p | grep ncurses, -p, Print cache
+
+output:
+	libncursesw.so.6 (libc6,x86-64) => /lib/x86_64-linux-gnu/libncursesw.so.6
+	libncurses.so.6 (libc6,x86-64) => /lib/x86_64-linux-gnu/libncurses.so.6
+	libncurses.so.5 (libc6,x86-64) => /lib/x86_64-linux-gnu/libncurses.so.5
+
+
+
