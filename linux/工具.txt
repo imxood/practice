@@ -1,4 +1,2 @@
 
-gnome tweaks工具:
-sudo apt install -y gnome-shell-extensions gnome-tweak-tool
 
