@@ -11,7 +11,6 @@ script_path = path.abspath(path.dirname(__file__))
 
 config_file = path.join(script_path, 'test.conf')
 
-
 def ssh_connect(host, port, username, password):
 
     try:
@@ -27,25 +26,31 @@ def ssh_connect(host, port, username, password):
     return ssh_fd
 
 def ssh_exec(ssh_fd, cmd):
+
     stdin, stdout, stderr = ssh_fd.exec_command(cmd)
     # for line in iter(stdout.readline, b''):
     #     print(line)
-    result = stdout.read()
-    print(result)
-    stdout.close()
+    result = stdout.read().decode()
+    if result:
+        return (0, result)
+
+    result = stderr.read().decode()
+    if result:
+        return (0, result)
+
+    print('error: reach an inaccessible place.')
 
 def ssh_disconnect(ssh_fd):
     ssh_fd.close()
 
-def run():
-    config = cp.ConfigParser()
-    config.read(config_file)
-    ssh_fd = ssh_connect(host, port, username, password)
-
-    ssh_exec(ssh_fd, 'pwd')
-
-    ssh_disconnect(ssh_fd)
 
 
-if __name__ == "__main__":
-    run()
+config = cp.ConfigParser()
+config.read(config_file)
+
+ssh_fd = ssh_connect(host, port, username, password)
+
+ret = ssh_exec(ssh_fd, "ls -al")
+
+print(ret[0])
+print(ret[1])
