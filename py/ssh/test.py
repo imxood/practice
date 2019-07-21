@@ -5,52 +5,94 @@ import os.path as path
 import configparser as cp
 import paramiko
 import getpass
-
+import re
+import time
 
 script_path = path.abspath(path.dirname(__file__))
-
 config_file = path.join(script_path, 'test.conf')
 
-def ssh_connect(host, port, username, password):
 
-    try:
+class RemoteShell():
 
-        ssh_fd = paramiko.SSHClient()
-        ssh_fd.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_fd.connect(host, port, username, password)
+    def __init__(self, user, password, host='127.0.0.1', port='22', is_print=True):
+        try:
+            self.host = host
+            self.port = port
+            self.user = user
+            self.password = password
+            self.is_print = is_print
 
-    except Exception as e:
-        print('ssh {}@{}: {}'.format(username, host, e))
-        exit(-1)
+            self.ssh_fd = paramiko.SSHClient()
+            self.ssh_fd.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.ssh_fd.connect(host, port, user, password)
 
-    return ssh_fd
+            # self.print('connected to "{}@{} -p {}"\n'.format(self.user, self.password, self.port))
 
-def ssh_exec(ssh_fd, cmd):
+        except Exception as e:
+            self.print('connect failed: {},  "{}@{} -p {}"\n'.format(e, self.user, self.password, self.port))
+            exit(-1)
 
-    stdin, stdout, stderr = ssh_fd.exec_command(cmd)
-    # for line in iter(stdout.readline, b''):
-    #     print(line)
-    result = stdout.read().decode()
-    if result:
-        return (0, result)
+    def exec(self, cmd):
 
-    result = stderr.read().decode()
-    if result:
-        return (0, result)
+        stdout = ''
+        stderr = ''
+        buff_size = 10240000
+        exit_status = 0
 
-    print('error: reach an inaccessible place.')
+        channel = self.ssh_fd.get_transport().open_session()
+        channel.get_pty()
 
-def ssh_disconnect(ssh_fd):
-    ssh_fd.close()
+        channel.exec_command(cmd)
 
+        while not channel.exit_status_ready():
 
+            time.sleep(0.001)
 
-config = cp.ConfigParser()
-config.read(config_file)
+            if not channel.recv_ready() and not channel.recv_stderr_ready():
+                continue
 
-ssh_fd = ssh_connect(host, port, username, password)
+            out = channel.recv(buff_size).decode()
+            stdout += out
+            self.print(out)
 
-ret = ssh_exec(ssh_fd, "ls -al")
+            if out and re.search(r'\[sudo\] password for', out):
+                length = channel.send(self.password+'\n')
+                if length != len(self.password) + 1:
+                    out = 'send passwd failed, ret len is wrong\n'
+                    self.print(out)
+                    exit_status = -1
+                    stderr += out
+                    return (exit_status, stdout, stderr)
 
-print(ret[0])
-print(ret[1])
+            while channel.recv_ready():
+                out = channel.recv(buff_size).decode()
+                stdout += out
+                self.print(out)
+
+            while channel.recv_stderr_ready():
+                out = channel.recv_stderr(buff_size).decode()
+                stderr += out
+                self.print(out)
+                exit_status = -2
+
+        return (exit_status, stdout, stderr)
+
+    def print(self, out):
+        if self.is_print:
+            print(out, end='')
+
+    def close(self):
+        self.ssh_fd.close()
+
+    def __del__(self):
+        self.ssh_fd.close()
+        # self.print('connect closed: "{}@{} -p {}"\n'.format(self.user, self.host, self.port))
+
+user = input('Enter user:')
+password = getpass.getpass()
+
+shell = RemoteShell(user, password)
+
+shell.exec('ls')
+
+shell.exec('sudo -k dmesg')
