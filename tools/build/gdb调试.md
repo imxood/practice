@@ -2,7 +2,7 @@
 ## gdb
 
 ```
-arm-zephyr-eabi-gdb /home/imxood/develop/code/sources/zephyrproject/zephyr/builds/zephyr/zephyr.elf
+arm-zephyr-eabi-gdb ~/develop/sources/zephyrproject/zephyr/builds/zephyr/zephyr.elf
 
 GDB Shell:
 

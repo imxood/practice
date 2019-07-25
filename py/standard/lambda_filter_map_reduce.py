@@ -7,6 +7,12 @@ command = '~/programs/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc -DBUILD
 
 # Use Lambda, Filter, Map
 
+v = map(lambda x: x[2:], filter(lambda x: x.startswith('-D'), command.split()))
+print(v)
+
+for va in v:
+    print(va)
+
 defines = list(map(lambda x: x[2:], filter(lambda x: x.startswith('-D'), command.split())))
 
 print(defines)
