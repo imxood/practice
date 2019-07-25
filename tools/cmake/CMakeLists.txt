@@ -95,6 +95,26 @@ test_source_add(tool.py)
 test_source_add_if(CONFIG_TEST tool.py CMakeLists.txt)
 
 
+function(MY_PARSE)
+
+    set(options ADULT Asa)
+    set(oneValueArgs NAME AGE)
+	set(multiValueArgs SCORE)
+
+	message(STATUS "${options}")
+
+    cmake_parse_arguments(STUDENT "ADULT;Asa" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+    # 通过 prefix_参数名: 例如 STUDENT_ADULT
+	message("isadult  = ${STUDENT_ADULT}")
+	message("Asa  = ${STUDENT_Asa}")
+    message("name  = ${STUDENT_NAME}")
+    message("age  = ${STUDENT_AGE}")
+    message("score  = ${STUDENT_SCORE}")
+
+endfunction()
+
+MY_PARSE(ADULT Asa NAME zhangsan AGE 20 SCORE 100 200 300 400 500)
 
 ##############
 
