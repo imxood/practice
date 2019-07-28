@@ -1,0 +1,141 @@
+version: "3.1"
+
+networks:
+    redmine:
+        driver: bridge
+
+services:
+    postgres:
+        image: postgres:latest
+        restart: always
+        networks:
+            - redmine
+        volumes:
+            - /srv/redmine/postgres-data:/var/lib/postgresql/data
+        environment:
+            - 'POSTGRES_PASSWORD=password'
+            - 'POSTGRES_DB=redmine'
+    redmine:
+        image: redmine:latest
+        restart: always
+        networks:
+            - redmine
+        volumes:
+            - /srv/redmine/redmine-data:/usr/src/redmine/files
+        ports:
+            - 8080:3000
+        environment:
+            - 'REDMINE_DB_POSTGRES=postgres'
+            - 'REDMINE_DB_DATABASE=redmine'
+            - 'REDMINE_DB_PASSWORD=password'
+
+
+    # taiga:
+    #     image: 'benhutchins/taiga'
+    #     ports:
+    #         - 80:80
+    #     # - 443:443 # To enable SSL, uncomment this line
+    #     depends_on:
+    #         - postgres
+    #     volumes:
+    #         # I recommend specifying a volume that maps to taiga's media,
+    #         # this way uploaded files are not lost during upgrades of the taiga image
+    #         - /srv/taiga/media:/usr/src/taiga-back/media
+
+    #         # If you'd like to store the configuration outside of the container,
+    #         # uncomment this volume. This allows for easy changes to the configuration.
+    #         # - ./conf/taiga:/taiga
+
+    #         # - ./ssl.crt:/etc/nginx/ssl/ssl.crt:ro # To enable SSL, uncomment this line
+    #         # - ./ssl.key:/etc/nginx/ssl/ssl.key:ro # To enable SSL, uncomment this line
+    #     environment:
+    #         # Your hostname (REQUIRED)
+    #         TAIGA_HOSTNAME: localhost
+
+    #         # Database settings
+    #         # To use an external database, simply update these and remove the postgres
+    #         # service from this docker-compose.yml file
+    #         TAIGA_DB_NAME: taigadb
+    #         TAIGA_DB_HOST: postgres
+    #         TAIGA_DB_USER: postgres
+    #         TAIGA_DB_PASSWORD: password
+    #         TAIGA_SLEEP: 15 # when the db comes up from docker, it is usually too quick
+
+    #         # TAIGA_SSL: True # To enable SSL, uncomment this line
+    #         # TAIGA_SSL_BY_REVERSE_PROXY: True # To enable SSL, handling by a reverse proxy, uncomment this
+
+    #         # To use an external SMTP for emails, fill in these values:
+    #         # TAIGA_ENABLE_EMAIL: True
+    #         # TAIGA_EMAIL_FROM: no-reply@taiga.mycompany.net
+    #         # TAIGA_EMAIL_USE_TLS: True
+    #         # TAIGA_EMAIL_HOST: smtp.google.com
+    #         # TAIGA_EMAIL_PORT: 587
+    #         # TAIGA_EMAIL_USER: me@gmail.com
+    #         # TAIGA_EMAIL_PASS: super-secure-pass phrase thing!
+
+    # postgres:
+    #     image: postgres
+    #     environment:
+    #         POSTGRES_DB: taigadb
+    #         POSTGRES_PASSWORD: password
+    #         POSTGRES_USER: postgres
+    #     ports:
+    #         - 5432
+    #     volumes:
+    #         # this helps prevent your postgres data from deleted
+    #         - /srv/taiga/pgdata:/var/lib/postgresql/data
+
+
+    # taiga:
+    #     image: fanningert/docker-taiga
+    #     ports:
+    #         - 80:80
+    #     links:
+    #         - postgres
+    #     environment:
+    #         - TAIGA_HOSTNAME=localhost
+    #         - TAIGA_DB_HOST=postgres
+    #         - TAIGA_DB_NAME=taiga
+    #         - TAIGA_DB_USER=taiga
+    #         - TAIGA_DB_PASSWORD=3MwR95cj9YAP7zm2lKrU
+    #         - TAIGA_SECRET_KEY=#1234567
+    #         - TAIGA_PUBLIC_REGISTER_ENABLED=true
+    #         - TAIGA_BACKEND_DEBUG=false
+    #         - TAIGA_FRONTEND_DEBUG=false
+    #         - TAIGA_FEEDBACK_ENABLED=false
+    #         - TAIGA_SSL=false
+    #         - TAIGA_DEFAULT_THEME=material-design
+    #         - LDAP_ENABLE=false
+    #     volumes:
+    #         - /srv/taiga/taiga-media:/taiga.io/taiga-back/media
+
+    # database:
+    #     image: postgres
+    #     environment:
+    #         - POSTGRES_DB=taiga
+    #         - POSTGRES_PASSWORD=changeme
+    #         - POSTGRES_USER=taiga
+    #     stop_signal: SIGINT
+    #     volumes:
+    #         - /srv/taiga/database:/var/lib/postgresql/data
+
+    # taiga:
+    #     image: devinsolutions/taiga:latest
+    #     healthcheck:
+    #         test: wget -q -t 1 --spider http://localhost:8080/api/v1/
+    #     ports:
+    #         - 8080:8080
+    #     stop_signal: SIGHUP
+    #     volumes:
+    #         - /srv/taiga/media:/srv/taiga-back/media
+
+    # taiga:
+    #     build: ./taiga
+    #     image: taiga
+    #     healthcheck:
+    #         test: wget -q -t 1 --spider http://localhost:8080/api/v1/
+    #     ports:
+    #         - 8080:8080
+    #     stop_signal: SIGHUP
+    #     volumes:
+    #         - /srv/taiga/taiga-back/media:/srv/taiga-back/media

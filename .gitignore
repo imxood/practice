@@ -11,3 +11,4 @@ mnt
 initrd
 .backup
 output*
+password
