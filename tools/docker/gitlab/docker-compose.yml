@@ -1,34 +1,78 @@
 version: "3.1"
 
 networks:
-    redmine:
-        driver: bridge
+    frantnet:
+    endnet:
 
 services:
+
+    web:
+        image: nginx
+        links:
+            - redmine:redmine
+            # - gitlab:gitlab
+            # - jenkins:jenkins
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf
+            - /srv/nginx/logs:/var/log/nginx
+        # command: [nginx-debug, '-g', 'daemon off;']
+
     postgres:
         image: postgres:latest
         restart: always
-        networks:
-            - redmine
+        # networks:
+        #     - endnet
         volumes:
-            - /srv/redmine/postgres-data:/var/lib/postgresql/data
+            - /srv/docker/redmine/postgres-data:/var/lib/postgresql/data
         environment:
+            - 'POSTGRES_USER=redmine'
             - 'POSTGRES_PASSWORD=password'
             - 'POSTGRES_DB=redmine'
+            - 'POSTGRES_PORT=5432'
+
     redmine:
-        image: redmine:latest
+        # container_name: redmine-site
+        image: sameersbn/redmine:latest
         restart: always
-        networks:
-            - redmine
+        depends_on:
+            - postgres
+        # networks:
+        #     - frantnet
+        #     - endnet
         volumes:
-            - /srv/redmine/redmine-data:/usr/src/redmine/files
+            - /srv/docker/redmine/redmine:/home/redmine/data
         ports:
             - 8080:3000
         environment:
-            - 'REDMINE_DB_POSTGRES=postgres'
-            - 'REDMINE_DB_DATABASE=redmine'
-            - 'REDMINE_DB_PASSWORD=password'
+            - TZ=Asia/Shanghai
 
+            - DB_ADAPTER=postgresql
+            - DB_HOST=postgres
+            - DB_PORT=5432
+            - DB_USER=redmine
+            - DB_PASS=password
+            - DB_NAME=redmine
+            - REDMINE_RELATIVE_URL_ROOT=/redmine
+
+            - SMTP_ENABLED=true
+            - SMTP_METHOD=smtp
+            - SMTP_DOMAIN=www.example.com
+            - SMTP_HOST=smtp.163.com
+            - SMTP_PORT=587
+            - SMTP_USER=starstartech@163.com
+            - SMTP_PASS=password
+            - SMTP_STARTTLS=true
+            - SMTP_AUTHENTICATION=:login
+
+            - IMAP_ENABLED=true
+            - IMAP_HOST=imap.163.com
+            - IMAP_PORT=993
+            - IMAP_USER=starstartech@163.com
+            - IMAP_PASS=password
+            - IMAP_SSL=true
+            - IMAP_INTERVAL=30
 
     # taiga:
     #     image: 'benhutchins/taiga'
@@ -84,58 +128,3 @@ services:
     #     volumes:
     #         # this helps prevent your postgres data from deleted
     #         - /srv/taiga/pgdata:/var/lib/postgresql/data
-
-
-    # taiga:
-    #     image: fanningert/docker-taiga
-    #     ports:
-    #         - 80:80
-    #     links:
-    #         - postgres
-    #     environment:
-    #         - TAIGA_HOSTNAME=localhost
-    #         - TAIGA_DB_HOST=postgres
-    #         - TAIGA_DB_NAME=taiga
-    #         - TAIGA_DB_USER=taiga
-    #         - TAIGA_DB_PASSWORD=3MwR95cj9YAP7zm2lKrU
-    #         - TAIGA_SECRET_KEY=#1234567
-    #         - TAIGA_PUBLIC_REGISTER_ENABLED=true
-    #         - TAIGA_BACKEND_DEBUG=false
-    #         - TAIGA_FRONTEND_DEBUG=false
-    #         - TAIGA_FEEDBACK_ENABLED=false
-    #         - TAIGA_SSL=false
-    #         - TAIGA_DEFAULT_THEME=material-design
-    #         - LDAP_ENABLE=false
-    #     volumes:
-    #         - /srv/taiga/taiga-media:/taiga.io/taiga-back/media
-
-    # database:
-    #     image: postgres
-    #     environment:
-    #         - POSTGRES_DB=taiga
-    #         - POSTGRES_PASSWORD=changeme
-    #         - POSTGRES_USER=taiga
-    #     stop_signal: SIGINT
-    #     volumes:
-    #         - /srv/taiga/database:/var/lib/postgresql/data
-
-    # taiga:
-    #     image: devinsolutions/taiga:latest
-    #     healthcheck:
-    #         test: wget -q -t 1 --spider http://localhost:8080/api/v1/
-    #     ports:
-    #         - 8080:8080
-    #     stop_signal: SIGHUP
-    #     volumes:
-    #         - /srv/taiga/media:/srv/taiga-back/media
-
-    # taiga:
-    #     build: ./taiga
-    #     image: taiga
-    #     healthcheck:
-    #         test: wget -q -t 1 --spider http://localhost:8080/api/v1/
-    #     ports:
-    #         - 8080:8080
-    #     stop_signal: SIGHUP
-    #     volumes:
-    #         - /srv/taiga/taiga-back/media:/srv/taiga-back/media
