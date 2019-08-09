@@ -485,7 +485,7 @@ class MainWindow(QWidget):
 
         self.setFixedSize(800, 600)
 
-        self.tabwidget: QTabWidget = QTabWidget(self)
+        self.tabwidget = QTabWidget(self)
 
         new_connect_btn = QPushButton(text='新建连接', parent=self.tabwidget)
         new_connect_btn.clicked.connect(self.new_connect_dialog)

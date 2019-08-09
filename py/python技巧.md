@@ -38,3 +38,9 @@ platform.node()          #计算机的网络名称' 
 platform.processor()    #计算机处理器信息'   
 
 platform.uname()        #包含上面所有的信息汇总
+
+
+## vscode 中python multiprocessing
+
+	import multiprocessing
+	multiprocessing.set_start_method('spawn', True)
