@@ -1,7 +1,7 @@
 from fabric import Connection
 
 
-c = Connection('mx@maxu-pc', connect_kwargs={'password': 'imxood'})
+c = Connection('mx@xxxx', connect_kwargs={'password': 'xxxx'})
 
 # c.put('py', '/home/mx/test')
 # c.run('ls -al ~/test')
