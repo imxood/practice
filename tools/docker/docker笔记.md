@@ -31,6 +31,28 @@ docker-compose --version
     https://github.com/docker/kitematic/releases
 
 
+
+## docker好用的命令:
+
+    docker ps -aq, 列出所有的容器 ID
+
+    docker stop $(docker ps -aq), 停止所有的容器
+
+    docker rm $(docker ps -aq), 删除所有的容器
+
+    docker rmi $(docker images -q), 删除所有的镜像
+
+    docker cp mycontainer:/opt/file.txt /opt/local/
+    docker cp /opt/local/file.txt mycontainer:/opt/, 复制文件
+
+
+## docker有了专门清理资源(container、image、网络)的命令docker, 1.13 中增加了 docker system prune的命令，针对container、image可以使用docker container prune、docker image prune命令
+
+    docker image prune --force --all
+    docker image prune -f -a: 删除所有不使用的镜像
+    docker container prune -f, 删除所有停止的容器
+
+
 ## 基本的docker命令
 
 docker images 查看镜像列表
