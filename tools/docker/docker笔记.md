@@ -26,6 +26,11 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 docker-compose --version
 
+## 安装Kitematic(docker的gui工具)
+
+    https://github.com/docker/kitematic/releases
+
+
 ## 基本的docker命令
 
 docker images 查看镜像列表
