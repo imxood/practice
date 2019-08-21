@@ -4,6 +4,8 @@
 
 curl -sSL https://get.daocloud.io/docker | sh
 
+sudo usermod -aG docker maxu
+
 加速: https://cr.console.aliyun.com
 
 vim /etc/docker/daemon.json
@@ -13,6 +15,16 @@ vim /etc/docker/daemon.json
 			"",
 		]
 	}
+
+加速: curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
+
+修改镜像默认存储路径
+vim /etc/docker/daemon.json:
+{
+	...
+	"graph":"/data/docker"
+}
+
 
 sudo systemctl restart docker.service
 
