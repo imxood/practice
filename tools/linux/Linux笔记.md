@@ -1,38 +1,50 @@
-# Linux命令
+# Linux笔记
+
+## CIDR子网划分
+
+    IP地址 = 网络前缀 + 主机号
+
+    192.168.0.7/18 = 11000000 10101000 00000000 00000111
+    18, 即连续18个1, 也就是网络地址占18位, 后14位是主机号
+
+    最小地址是：192.168.0.0      = 11000000 00001110 00000000 00000000 
+    最大地址是：192.168.63.255   = 11000000 00001110 00111111 11111111
+    子网掩码是：255.255.192.0    = 11111111 11111111 11000000 00000000
 
 ## ssh 免密登录
 
 生成证书:
 
-	ssh-keygen -t rsa
+    ssh-keygen -t rsa
 
 拷贝公钥到服务器上:
 
-	ssh-copy-id USER@HOST
+    ssh-copy-id USER@HOST
 
+## 指定用户登出
 
-### 指定用户登出
     pkill -kill -t tty
 
-### grep技巧, -r 递归, -i 忽略大小写, -n 显示行数, --exclude-dir 排除目录, -E 表示可扩展的正则表达式
+## grep技巧, -r 递归, -i 忽略大小写, -n 显示行数, --exclude-dir 排除目录, -E 表示可扩展的正则表达式
+
     sudo grep "ss-qt5" / -r -i -n --exclude-dir={proc,sys}
     echo aabbccddbbee | awk '{split($0,arr,"bb");for(i in arr) print arr[i]}'
 
-### 查看所有网卡
+## 查看所有网卡
+
     ifconfig -a
     cat /proc/net/dev
 
+## ubuntu 重启网络
 
-### ubuntu 重启网络
+    sudo service networking restart
 
-	sudo service networking restart
-
-### 设置开机启动以太网eth0:
+## 设置开机启动以太网eth0
 
     sudo vim /etc/network/interfaces
     自启动eth0, 并设置eth0为ip4, 自动分配ip:
 
-		auto eth0
+        auto eth0
         iface eth0 inet dhcp
 
     自启动eth0, 并设置eth0为ip4, 静态ip:
@@ -42,75 +54,66 @@
             netmask 255.255.255.0
             gateway 192.10.1.254
 
-### ssh安装
-	sudo apt-get install openssh-server
-	sudo vim /etc/ssh/sshd_config
-	把配置文件中的"PermitRootLogin without-password"加一个"#"号,
-	再增加一句"PermitRootLogin yes",
-	保存，修改成功。
+## ssh安装
 
-### Linux系统如何查看版本信息
-	打印系统信息, 包括: -s 内核名称, -r 内核版本, -n 网络节点名称(hostname), -o 操作系统(eq: GNU/Linux), -p 处理器结构
+    sudo apt-get install openssh-server
+    sudo vim /etc/ssh/sshd_config
+    把配置文件中的"PermitRootLogin without-password"加一个"#"号,
+    再增加一句"PermitRootLogin yes",
+    保存，修改成功。
+
+## Linux系统如何查看版本信息
+
+    打印系统信息, 包括: -s 内核名称, -r 内核版本, -n 网络节点名称(hostname), -o 操作系统(eq: GNU/Linux), -p 处理器结构
     uname -a
-	显示内核版本: 						cat /proc/version
-	显示发行版本信息:					cat /etc/issue
-										lsb_release -a
+    显示内核版本:            cat /proc/version
+    显示发行版本信息:         cat /etc/issue
+                           lsb_release -a
 
-### ubuntu搜索已安装软件
-	dpkg -l
+## ubuntu搜索已安装软件
 
-### 查看当前目录大小
-	du -sh
+    dpkg -l
 
-### ssl问题
-	ubuntu@tegra-ubuntu:~/robot/develop/ros_third/src$ wget https://github.com/imxood/StudyNote/raw/master/git%E7%AC%94%E8%AE%B0.txt
-	--2017-09-22 16:27:38--  https://github.com/imxood/StudyNote/raw/master/git%E7%AC%94%E8%AE%B0.txt
-	Resolving github.com (github.com)... 192.30.255.112, 192.30.255.113
-	Connecting to github.com (github.com)|192.30.255.112|:443... connected.
-	ERROR: cannot verify github.com's certificate, issued by ‘CN=DigiCert SHA2 Extended Validation Server CA,OU=www.digicert.com,O=DigiCert Inc,C=US’:
-	Unable to locally verify the issuer's authority.
-	To connect to github.com insecurely, use `--no-check-certificate'.
+## 查看当前目录大小
 
-    wget https://www.digicert.com/CACerts/DigiCertHighAssuranceEVCA-1.crt --no-check-certificate
-    sudo cp DigiCertHighAssuranceEVCA-1.crt /usr/local/share/ca-certificates/
-    sudo update-ca-certificates
-    solved!
+    du -sh
 
-### 用户管理:
-	先给个例子:
-	sudo useradd -m  -s /bin/bash maxu 添加用户maxu, 设置home目录, home模板来自/etc/skel, -s 指定bash, 若不指定, 则默认是/bin/sh, 没有tab自动补全及当前路径
-	sudo userdel maxu, 删除用户, 不删除用户目录, 若加上-r会把用户目录一起删掉
+### 用户管理
 
-	useradd 注：添加用户
-	passwd 注：为用户设置密码
-	usermod 注：修改用户命令，可以通过usermod 来修改登录名、用户的家目录等等；
-	id 注：查看用户的UID、GID及所归属的用户组
-	groupadd 注：添加用户组；
-	groupdel 注：删除用户组；
-	groupmod 注：修改用户组信息
-	groups 注：显示用户所属的用户组
+    先给个例子:
+    sudo useradd -m  -s /bin/bash maxu 添加用户maxu, 设置home目录, home模板来自/etc/skel, -s 指定bash, 若不指定, 则默认是/bin/sh, 没有tab自动补全及当前路径
+    sudo userdel maxu, 删除用户, 不删除用户目录, 若加上-r会把用户目录一起删掉
 
-	usermod -a -G sudo,adm,dialout peak 给peak zhui加sudo,adm,dialout组
+    useradd 注：添加用户
+    passwd 注：为用户设置密码
+    usermod 注：修改用户命令，可以通过usermod 来修改登录名、用户的家目录等等；
+    id 注：查看用户的UID、GID及所归属的用户组
+    groupadd 注：添加用户组；
+    groupdel 注：删除用户组；
+    groupmod 注：修改用户组信息
+    groups 注：显示用户所属的用户组
+
+    usermod -a -G sudo,adm,dialout peak 给peak zhui加sudo,adm,dialout组
     <!-- peak adm dialout cdrom sudo dip plugdev netdev lpadmin -->
 
-	cat /etc/passwd 查看Linux下所有用户
-		root:x:0:0:root:/root:/bin/bash
-		maxu:x:1001:0::/home/maxu:/bin/bash
-		...
-		username:password:uid:gid:allname:homedir:shell
+    cat /etc/passwd 查看Linux下所有用户
+        root:x:0:0:root:/root:/bin/bash
+        maxu:x:1001:0::/home/maxu:/bin/bash
+        ...
+        username:password:uid:gid:allname:homedir:shell
 
-		uid是0，就表示是超级管理员
+        uid是0，就表示是超级管理员
 
-	cat /etc/shadow 查看用户的密码加密内容
+    cat /etc/shadow 查看用户的密码加密内容
 
-	cat /etc/group 查看用户的组信息:
-		root:x:0:
-		daemon:x:1:
-		bin:x:2:
-		sys:x:3:
-		adm:x:4:syslog,peak
-		...
-		groupname:password:gid:members
+    cat /etc/group 查看用户的组信息:
+        root:x:0:
+        daemon:x:1:
+        bin:x:2:
+        sys:x:3:
+        adm:x:4:syslog,peak
+        ...
+        groupname:password:gid:members
 
 
 ### fatal error: boost/shared_ptr.hpp: 没有那个文件或目录:

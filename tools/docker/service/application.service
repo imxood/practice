@@ -1,0 +1,9 @@
+[Unit]
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/docker-compose -f /home/maxu/develop/sources/practice/tools/docker/service/docker-compose.yml up
+
+[Install]
+WantedBy=multi-user.target
