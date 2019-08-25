@@ -24,5 +24,5 @@ export ZEPHYR_SDK_INSTALL_DIR=~/programs/zephyr-sdk
 . ~/develop/sources/zephyrproject/zephyr/zephyr-env.sh
 
 
-eval "$(pyenv virtualenv-init - || true)"
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+#eval "$(pyenv virtualenv-init - || true)"
+#export PYENV_VIRTUALENV_DISABLE_PROMPT=1

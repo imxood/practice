@@ -2,19 +2,11 @@
 
 ## linux安装docker
 
-curl -sSL https://get.daocloud.io/docker | sh
+curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
 
 sudo usermod -aG docker maxu
 
-加速: https://cr.console.aliyun.com
-
-vim /etc/docker/daemon.json
-
-	{
-		"registry-mirrors": [
-			"",
-		]
-	}
+sudo apt install -y docker-compose
 
 加速: curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
 
@@ -30,13 +22,6 @@ sudo systemctl restart docker.service
 
 docker info
 
-# 安装docker-compose
-
-sudo bash -c "curl -L https://get.daocloud.io/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
-
-sudo chmod +x /usr/local/bin/docker-compose
-
-docker-compose --version
 
 ## 安装Kitematic(docker的gui工具)
 

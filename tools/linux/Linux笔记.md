@@ -1,5 +1,74 @@
 # Linux笔记
 
+## 防火墙规则
+
+<center><img src="imgs/iptables_rule.jpg"/></center>
+<center><img src="imgs/iptables_rule_param.jpg"/></center>
+
+-j
+
+ACCEPT 允许数据包通过
+DROP 直接丢弃数据包，不给任何回应信息
+REJECT 拒绝数据包通过，必要时会给数据发送端一个响应的信息。
+
+1. 删除INPUT链的第一条规则
+    iptables -D INPUT 1
+
+1. 拒绝进入防火墙的所有ICMP协议数据包
+    iptables -I INPUT -p icmp -j REJECT
+
+1. 允许防火墙转发除ICMP协议以外的所有数据包
+    iptables -I FORWARD -p ! icmp -j ACCEPT
+
+1. 拒绝转发来自192.168.1.10主机的数据，允许转发来自192.168.0.0/24网段的数据
+    iptables -A FORWARD -s 192.168.1.11 -j REJECT
+    iptables -A FORWARD -s 192.168.0.0/24 -j ACCEPT
+    ps: 要把拒绝的放在前面不然就不起作用了啊
+
+1. 丢弃从外网接口(eth1)进入防火墙本机的源地址为私网地址的数据包
+    iptables -A INPUT -i eth1 -s 192.168.0.0/16 -j DROP
+    iptables -A INPUT -i eth1 -s 172.16.0.0/12 -j DROP
+    iptables -A INPUT -i eth1 -s 10.0.0.0/8 -j DROP
+
+1. 只允许管理员从202.13.0.0/16网段使用SSH远程登录防火墙主机
+    iptables -A INPUT -p tcp --dport 22 -s 202.13.0.0/16 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 22 -j DROP
+    ps: -d 目的主机, -s 源主机, --dport 目的端口 --sport 来源端口
+
+1. 允许本机开放从TCP端口20-1024提供的应用服务
+    iptables -A INPUT -p tcp --dport 20:1024 -j ACCEPT
+    iptables -A OUTPUT -p tcp --sport 20:1024 -j ACCEPT
+
+1. 允许转发来自192.168.0.0/24局域网段的DNS解析请求数据包
+    iptables -A FORWARD -s 192.168.0.0/24 -p udp --dport 53 -j ACCEPT
+    iptables -A FORWARD -d 192.168.0.0/24 -p udp --sport 53 -j ACCEPT
+
+1. 禁止其他主机ping防火墙主机，但是允许从防火墙上ping其他主机
+    iptables -I INPUT -p icmp --icmp-type Echo-Request -j DROP
+    iptables -I INPUT -p icmp --icmp-type Echo-Reply -j ACCEPT
+    iptables -I INPUT -p icmp --icmp-type destination-Unreachable -j ACCEPT
+
+1. 禁止转发来自MAC地址为00：0C：29：27：55：3F的和主机的数据包
+    iptables -A FORWARD -m mac --mac-source 00:0c:29:27:55:3F -j DROP
+    ps: "-m mac --mac-source"来表示数据包的源MAC地址
+
+1. 允许防火墙本机对外开放TCP端口20、21、25、110以及被动模式FTP端口1250-1280
+    iptables -A INPUT -p tcp -m multiport --dport 20,21,25,110,1250:1280 -j ACCEPT
+    ps: -m multiport --dport, 指定目的端口及范围
+
+1. 禁止转发源IP地址为192.168.1.20-192.168.1.99的TCP数据包
+    iptables -A FORWARD -p tcp -m iprange --src-range 192.168.1.20-192.168.1.99 -j DROP
+    ps: "-m --iprange --src-range"指定IP范围
+
+1. 禁止转发与正常TCP连接无关的非—syn请求数据包
+    iptables -A FORWARD -m state --state NEW -p tcp ! --syn -j DROP
+    ps: "-m state"表示数据包的连接状态, "NEW"表示与任何连接无关的，新的嘛
+
+1. 拒绝访问防火墙的新数据包，但允许响应连接或与已有连接相关的数据包
+    iptables -A INPUT -p tcp -m state --state NEW -j DROP
+    iptables -A INPUT -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
+    ps: "ESTABLISHED"表示已经响应请求或者已经建立连接的数据包，"RELATED"表示与已建立的连接有相关性的，比如FTP数据连接等
+
 ## CIDR子网划分
 
     IP地址 = 网络前缀 + 主机号
@@ -10,6 +79,11 @@
     最小地址是：192.168.0.0      = 11000000 00001110 00000000 00000000 
     最大地址是：192.168.63.255   = 11000000 00001110 00111111 11111111
     子网掩码是：255.255.192.0    = 11111111 11111111 11000000 00000000
+
+## video card
+
+    sudo ubuntu-drivers devices
+    sudo ubuntu-drivers autoinstall
 
 ## ssh 免密登录
 
@@ -115,11 +189,12 @@
         ...
         groupname:password:gid:members
 
+### fatal error: boost/shared_ptr.hpp: 没有那个文件或目录
 
-### fatal error: boost/shared_ptr.hpp: 没有那个文件或目录:
 	sudo apt-get install --no-install-recommends libboost-all-dev
 
 ### 架构
+
     dpkg --print-architecture， 显示系统架构
     dpkg --print-foreign-architectures， 显示其它系统架构
 
@@ -137,6 +212,7 @@
     sudo dpkg --remove-architecture i386
 
 ### 查询相关
+
     readlink -f .,获取路径
     dirname .,获取目录名
     basename .,获取文件名
@@ -149,6 +225,7 @@
     lsblk 查看块设备信息
 
 ### 挂载
+
     fuser -km /media/peak/3930-38331 查看并杀死正在使用的指定挂载文件系统
     umount /media/peak/3930-38331 卸载文件系统
     mount -t vfat /dev/mmcblk1p1 ~/sdisk
@@ -173,34 +250,40 @@
     fi
 
 ### umask
+
     处理默认权限，shell中执行umask命令,查看当前用户的umask:0002
     创建目录时, 目录的默认权限是:7-0,7-0,7-2 即775
     创建文件时，默认不具有执行权限，则默认权限是:6-0,6-0,6-2 即664
 
 ### 查看usb设备的具体信息
+
     udevadm info --attribute-walk --path=/sys/bus/usb-serial/devices/ttyUSB0
     sudo vim /etc/udev/rules.d/myusb.rules 编写设备规则
     rule:
         MODE:="0666" 设置每个人都有读写权限
 
 ### linux中的常见脚本
+
     /etc/fstab
     /etc/init.d/rcS
     /etc/rc.d/rc.local
 
 ### ping的原理是什么
 
-
 ### Show the status of modules in the Linux Kernel
+
     lsmod
 
 ### 查看已安装的驱动
+
     cat /lib/modules/$(uname -r)/modules.builtin
 
 ### wget
+
     -P  下载到指定目录
 
 ### 添加自启动服务
+
     sudo chmod 755 new_service.sh
     sudo update-rc.d new_service.sh defaults 90
     sudo update-rc.d -f new_service.sh remove
@@ -209,61 +292,73 @@
     systemctl status RobotBringup.service
 
 ### 查看网络端口占用的两种方法, 第二种最为详细,相关的打开都会显示
+
     ss -nl | grep 10086
     lsof -i:10086,  list open files
 
 ### 设置gnome应用的自动启动属性, .desktop文件位于~/.autostart目录中
+
     X-GNOME-Autostart-enabled=true
 
 ### ubuntu17 设置关闭,最大化,最小化按钮
+
     左边:
     gsettings set org.gnome.desktop.wm.preferences button-layout 'close,maximize,minimize:'
     右边：
     gsettings set org.gnome.desktop.wm.preferences button-layout ':close,maximize,minimize'
 
-
 ### 时间命令
+
     date +%Y-%m-%d.%H:%M:%S
     输出:2018-02-17.23:35:45
     设置时间:
     date -s "2018-04-17 8:00:00"
 
 ### 查看声卡设备
+
 	aplay -l    list all soundcards and digital audio devices
     aplay -L    list device names
     cat /proc/asound/cards
 
 ### 查看可执行程序的链接信息
+
     readelf -a programName
 
     -d, 可显示目标程序的动态库
     readelf -d audio_proc_test
 
 ### 查看所有的总线设备
+
     lspci
 
 ### 显示系统的版本信息, -s, short 简写, 只显示值
+
     lsb_release -a
 
 ### 显示所有的块设备
+
     lsblk
 
 ### updates and queries runlevel information for system services 更新或请求系统服务的运行级别的信息
+
     chkconfig --list
 
 ### 让httpd 在机器启动的时候在运行级别上启动
+
     chkconfig --level 345 httpd on
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 -->
 
-### apt设置代理
+## apt设置代理
+
     sudo vim /etc/apt/apt.conf
     添加(带有分号):
         Acquire::http::proxy "http://127.0.0.1:8123";
         Acquire::https::proxy "https://127.0.0.1:8123";
 
 ### fdisk
+
     p、打印分区表。
     n、新建一个新分区。
     d、删除一个分区。
@@ -286,25 +381,23 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
     7  ll /tmp/boot/
     8  grub-install --root-directory=/tmp/boot --no-floppy /dev/sdc
     9  umount /dev/sdc1
-   10  lsblk
-   11  ls
-   12  fdisk /dev/sdc
-   13  partprobe
-   14  mkfs.vfat -F 32 -n MULTIBOOT /dev/sdc1
-   15  umount /dev/sdc1
-   16  mkfs.vfat -F 32 -n MULTIBOOT /dev/sdc1
-   17  ll /media/
-   18  lsblk
-   19  grub-install --force --no-floppy --root-directory=/media/mx/MULTIBOOT /dev/sdc1
-   20  cd /media/mx/MULTIBOOT/
-   21  ls
-   22  cd boot/grub/
-   23  wget http://pendrivelinux.com/downloads/multibootlinux/grub.cfg
-   24  ls
-   25  cat grub.cfg
-   26  history
-
-
+    10  lsblk
+    11  ls
+    12  fdisk /dev/sdc
+    13  partprobe
+    14  mkfs.vfat -F 32 -n MULTIBOOT /dev/sdc1
+    15  umount /dev/sdc1
+    16  mkfs.vfat -F 32 -n MULTIBOOT /dev/sdc1
+    17  ll /media/
+    18  lsblk
+    19  grub-install --force --no-floppy --root-directory=/media/mx/MULTIBOOT /dev/sdc1
+    20  cd /media/mx/MULTIBOOT/
+    21  ls
+    22  cd boot/grub/
+    23  wget http://pendrivelinux.com/downloads/multibootlinux/grub.cfg
+    24  ls
+    25  cat grub.cfg
+    26  history
 
     # mbr转gpt之前先执行下面,否则: grub-install: warning: Attempting to install GRUB to a disk with multiple partition labels.  This is not supported yet..
 
@@ -421,278 +514,280 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 
     <!-- sudo grub-install --target=i386-pc --no-floppy --boot-directory=/mnt/dev/boot /dev/sdc -->
 
-# mbr转gpt
-sudo parted /dev/sdc----->mklabel gpt
+## mbr转gpt
 
+    sudo parted /dev/sdc----->mklabel gpt
 
+## linux查看设备命令
 
+    # uname -a               # 查看内核/操作系统/CPU信息
+    # head -n 1 /etc/issue   # 查看操作系统版本
+    # cat /proc/cpuinfo      # 查看CPU信息
+    # hostname               # 查看计算机名
+    # lspci -tv              # 列出所有PCI设备
+    # lsusb -tv              # 列出所有USB设备
+    # lsmod                  # 列出加载的内核模块
+    # env                    # 查看环境变量
+    cat /proc/asound/cards 查看声卡设备
+    资源
 
+    # free -m                # 查看内存使用量和交换区使用量
+    # df -h                  # 查看各分区使用情况
+    # du -sh <目录名>        # 查看指定目录的大小
+    # grep MemTotal /proc/meminfo   # 查看内存总量
+    # grep MemFree /proc/meminfo    # 查看空闲内存量
+    # uptime                 # 查看系统运行时间、用户数、负载
+    # cat /proc/loadavg      # 查看系统负载
+    磁盘和分区
 
+    # mount | column -t      # 查看挂接的分区状态
+    # fdisk -l               # 查看所有分区
+    # swapon -s              # 查看所有交换分区
+    # hdparm -i /dev/hda     # 查看磁盘参数(仅适用于IDE设备)
+    # dmesg | grep IDE       # 查看启动时IDE设备检测状况
+    网络
 
-linux查看设备命令
+    # ifconfig               # 查看所有网络接口的属性
+    # iptables -L            # 查看防火墙设置
+    # route -n               # 查看路由表
+    # netstat -lntp          # 查看所有监听端口
+    # netstat -antp          # 查看所有已经建立的连接
+    # netstat -s             # 查看网络统计信息
+    进程
 
-系统
+    # ps -ef                 # 查看所有进程
+    # top                    # 实时显示进程状态
+    用户
 
-# uname -a               # 查看内核/操作系统/CPU信息
- # head -n 1 /etc/issue   # 查看操作系统版本
-# cat /proc/cpuinfo      # 查看CPU信息
- # hostname               # 查看计算机名
-# lspci -tv              # 列出所有PCI设备
- # lsusb -tv              # 列出所有USB设备
-# lsmod                  # 列出加载的内核模块
- # env                    # 查看环境变量
-cat /proc/asound/cards 查看声卡设备
-资源
+    # w                      # 查看活动用户
+    # id <用户名>            # 查看指定用户信息
+    # last                   # 查看用户登录日志
+    # cut -d: -f1 /etc/passwd   # 查看系统所有用户
+    # cut -d: -f1 /etc/group    # 查看系统所有组
+    # crontab -l             # 查看当前用户的计划任务
+    服务
 
-# free -m                # 查看内存使用量和交换区使用量
-# df -h                  # 查看各分区使用情况
-# du -sh <目录名>        # 查看指定目录的大小
-# grep MemTotal /proc/meminfo   # 查看内存总量
- # grep MemFree /proc/meminfo    # 查看空闲内存量
-# uptime                 # 查看系统运行时间、用户数、负载
-# cat /proc/loadavg      # 查看系统负载
-磁盘和分区
+    # chkconfig --list       # 列出所有系统服务
+    # chkconfig --list | grep on    # 列出所有启动的系统服务
+    程序
 
-# mount | column -t      # 查看挂接的分区状态
-# fdisk -l               # 查看所有分区
-# swapon -s              # 查看所有交换分区
- # hdparm -i /dev/hda     # 查看磁盘参数(仅适用于IDE设备)
-# dmesg | grep IDE       # 查看启动时IDE设备检测状况
-网络
+    # rpm -qa                # 查看所有安装的软件包
 
-# ifconfig               # 查看所有网络接口的属性
- # iptables -L            # 查看防火墙设置
-# route -n               # 查看路由表
-# netstat -lntp          # 查看所有监听端口
-# netstat -antp          # 查看所有已经建立的连接
- # netstat -s             # 查看网络统计信息
-进程
+## 常用命令整理如下
 
-# ps -ef                 # 查看所有进程
-# top                    # 实时显示进程状态
-用户
+    查看主板的序列号: dmidecode | grep -i ’serial number’
 
-# w                      # 查看活动用户
-# id <用户名>            # 查看指定用户信息
-# last                   # 查看用户登录日志
-# cut -d: -f1 /etc/passwd   # 查看系统所有用户
-# cut -d: -f1 /etc/group    # 查看系统所有组
-# crontab -l             # 查看当前用户的计划任务
-服务
+    用硬件检测程序kuduz探测新硬件：service kudzu start ( or restart)
 
-# chkconfig --list       # 列出所有系统服务
-# chkconfig --list | grep on    # 列出所有启动的系统服务
-程序
+    查看CPU信息：cat /proc/cpuinfo [dmesg | grep -i 'cpu'][dmidecode -t processor]
 
-# rpm -qa                # 查看所有安装的软件包
+    查看内存信息：cat /proc/meminfo [free -m][vmstat]
 
+    查看板卡信息：cat /proc/pci
 
-常用命令整理如下：
-查看主板的序列号: dmidecode | grep -i ’serial number’
+    查看显卡/声卡信息：lspci |grep -i ‘VGA’[dmesg | grep -i 'VGA']
 
-用硬件检测程序kuduz探测新硬件：service kudzu start ( or restart)
+    查看网卡信息：dmesg | grep -i ‘eth’[cat /etc/sysconfig/hwconf | grep -i eth][lspci | grep -i 'eth']
+    <!--more-->
+    查看PCI信息：lspci (相比cat /proc/pci更直观）
 
-查看CPU信息：cat /proc/cpuinfo [dmesg | grep -i 'cpu'][dmidecode -t processor]
+    查看USB设备：cat /proc/bus/usb/devices
 
-查看内存信息：cat /proc/meminfo [free -m][vmstat]
+    查看键盘和鼠标:cat /proc/bus/input/devices
 
-查看板卡信息：cat /proc/pci
+    查看系统硬盘信息和使用情况：fdisk & disk – l & df
 
-查看显卡/声卡信息：lspci |grep -i ‘VGA’[dmesg | grep -i 'VGA']
+    查看各设备的中断请求(IRQ):cat /proc/interrupts
 
-查看网卡信息：dmesg | grep -i ‘eth’[cat /etc/sysconfig/hwconf | grep -i eth][lspci | grep -i 'eth']
-<!--more-->
-查看PCI信息：lspci (相比cat /proc/pci更直观）
+    查看系统体系结构：uname -a
 
-查看USB设备：cat /proc/bus/usb/devices
+    查看及启动系统的32位或64位内核模式：isalist –v [isainfo –v][isainfo –b]
 
-查看键盘和鼠标:cat /proc/bus/input/devices
+    dmidecode查看硬件信息，包括bios、cpu、内存等信息
 
-查看系统硬盘信息和使用情况：fdisk & disk – l & df
+    测定当前的显示器刷新频率：/usr/sbin/ffbconfig –rev \?
 
-查看各设备的中断请求(IRQ):cat /proc/interrupts
+    查看系统配置：/usr/platform/sun4u/sbin/prtdiag –v
 
-查看系统体系结构：uname -a
+    查看当前系统中已经应用的补丁：showrev –p
 
-查看及启动系统的32位或64位内核模式：isalist –v [isainfo –v][isainfo –b]
+    显示当前的运行级别：who –rH
 
-dmidecode查看硬件信息，包括bios、cpu、内存等信息
+    查看当前的bind版本信息：nslookup –class=chaos –q=txt version.bind
 
-测定当前的显示器刷新频率：/usr/sbin/ffbconfig –rev \?
+    dmesg | more 查看硬件信息
+    lspci 显示外设信息, 如usb，网卡等信息
+    lsnod 查看已加载的驱动
+    lshw
+    psrinfo -v 查看当前处理器的类型和速度（主频）
+    prtconf -v 打印当前的OBP版本号
+    iostat –E 查看硬盘物理信息(vendor, RPM, Capacity)
+    prtvtoc /dev/rdsk/c0t0d0s 查看磁盘的几何参数和分区信息
+    df –F ufs –o i 显示已经使用和未使用的i-node数目
+    isalist –v
 
-查看系统配置：/usr/platform/sun4u/sbin/prtdiag –v
+    对于"/proc"中文件可使用文件查看命令浏览其内容，文件中包含系统特定信息：
+    Cpuinfo 主机CPU信息
+    Dma 主机DMA通道信息
+    Filesystems 文件系统信息
+    Interrupts 主机中断信息
+    Ioprots 主机I/O端口号信息
+    Meninfo 主机内存信息
+    Version Linux内存版本信息
 
-查看当前系统中已经应用的补丁：showrev –p
+    备注： proc – process information pseudo-filesystem 进程信息伪装文件系统
 
-显示当前的运行级别：who –rH
+    修改系统时间:
+    sudo date +'%Y%m%d %H%M' --set='20180412 1049'
 
-查看当前的bind版本信息：nslookup –class=chaos –q=txt version.bind
-
-dmesg | more 查看硬件信息
-lspci 显示外设信息, 如usb，网卡等信息
-lsnod 查看已加载的驱动
-lshw
-psrinfo -v 查看当前处理器的类型和速度（主频）
-prtconf -v 打印当前的OBP版本号
-iostat –E 查看硬盘物理信息(vendor, RPM, Capacity)
-prtvtoc /dev/rdsk/c0t0d0s 查看磁盘的几何参数和分区信息
-df –F ufs –o i 显示已经使用和未使用的i-node数目
-isalist –v
-
-对于“/proc”中文件可使用文件查看命令浏览其内容，文件中包含系统特定信息：
-Cpuinfo 主机CPU信息
-Dma 主机DMA通道信息
-Filesystems 文件系统信息
-Interrupts 主机中断信息
-Ioprots 主机I/O端口号信息
-Meninfo 主机内存信息
-Version Linux内存版本信息
-
-备注： proc – process information pseudo-filesystem 进程信息伪装文件系统
-
-
-修改系统时间:
-sudo date +'%Y%m%d %H%M' --set='20180412 1049'
 ### synclient触摸板设置
+
     synclient -l 查看所有设置
 
     https://wiki.archlinux.org/index.php/Touchpad_Synaptics_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
 
+## 查询系统安装的gcc版本
 
+    rpm -q gcc
 
-查询系统安装的gcc版本:
-rpm -q gcc
+    cat /lib/modules/$(uname -r)/modules.builtin
 
-cat /lib/modules/$(uname -r)/modules.builtin
+    cat /etc/filesystems
 
-cat /etc/filesystems
+    df -h 查看磁盘用量
 
-df -h 查看磁盘用量
+    mount -o 这里的options,查找方式, 比如搜索: xfs File Formats Manual
 
-mount -o 这里的options,查找方式, 比如搜索: xfs File Formats Manual
+    grub2-set-default 0 && init 6
 
-grub2-set-default 0 && init 6
-### u盘制作grub2引导
-为了避免出错:grub2-install: error: will not proceed with blocklists.先执行:
-sudo dd if=/dev/zero of=/dev/sdc seek=1 count=2047
+## u盘制作grub2引导
 
-sudo umount /dev/sdc*
-sudo fdisk /dev/sdc
+    为了避免出错:grub2-install: error: will not proceed with blocklists.先执行:
+    sudo dd if=/dev/zero of=/dev/sdc seek=1 count=2047
 
-<!-- 删除所有分区,创键一个/dev/sdc1 -->
+    sudo umount /dev/sdc*
+    sudo fdisk /dev/sdc
 
-sudo mount /dev/sdc1 /tmp/pe
-sudo grub-install --root-directory=/tmp/pe --efi-directory=/tmp/pe/boot /dev/sdc
+    <!-- 删除所有分区,创键一个/dev/sdc1 -->
 
-出现这个错：
-解决:
+    sudo mount /dev/sdc1 /tmp/pe
+    sudo grub-install --root-directory=/tmp/pe --efi-directory=/tmp/pe/boot /dev/sdc
 
-再重新: sudo grub2-install ...
+    出现这个错：
+    解决:
 
-sudo grub2-mkconfig -o /tmp/pe/boot/grub2/grub.cfg
+    再重新: sudo grub2-install ...
 
-yum install qemu-system-x86
-qemu-system-x86_64 -machine accel=kvm:tcg -m 2048 -hda /dev/sdc
+    sudo grub2-mkconfig -o /tmp/pe/boot/grub2/grub.cfg
 
-yum install ntfs-3g
-grub2-mkconfig -o /boot/grub2/grub.cfg
-会有如下信息:
-Generating grub configuration file ...
-Found linux image: /boot/vmlinuz-4.16.0-1.el7.elrepo.x86_64
-Found initrd image: /boot/initramfs-4.16.0-1.el7.elrepo.x86_64.img
-Found linux image: /boot/vmlinuz-3.10.0-693.21.1.el7.x86_64
-Found initrd image: /boot/initramfs-3.10.0-693.21.1.el7.x86_64.img
-Found linux image: /boot/vmlinuz-3.10.0-693.el7.x86_64
-Found initrd image: /boot/initramfs-3.10.0-693.el7.x86_64.img
-Found linux image: /boot/vmlinuz-0-rescue-d7f616c52b4d4d7196862f3fc93f2cf7
-Found initrd image: /boot/initramfs-0-rescue-d7f616c52b4d4d7196862f3fc93f2cf7.img
-Found Windows 10 (loader) on /dev/sdb1
-done
-最后第二行，就是配置windows10的引导项.
+    yum install qemu-system-x86
+    qemu-system-x86_64 -machine accel=kvm:tcg -m 2048 -hda /dev/sdc
 
-ls *.ko | xargs -I {} cp {} /lib/modules
+    yum install ntfs-3g
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+    会有如下信息:
+    Generating grub configuration file ...
+    Found linux image: /boot/vmlinuz-4.16.0-1.el7.elrepo.x86_64
+    Found initrd image: /boot/initramfs-4.16.0-1.el7.elrepo.x86_64.img
+    Found linux image: /boot/vmlinuz-3.10.0-693.21.1.el7.x86_64
+    Found initrd image: /boot/initramfs-3.10.0-693.21.1.el7.x86_64.img
+    Found linux image: /boot/vmlinuz-3.10.0-693.el7.x86_64
+    Found initrd image: /boot/initramfs-3.10.0-693.el7.x86_64.img
+    Found linux image: /boot/vmlinuz-0-rescue-d7f616c52b4d4d7196862f3fc93f2cf7
+    Found initrd image: /boot/initramfs-0-rescue-d7f616c52b4d4d7196862f3fc93f2cf7.img
+    Found Windows 10 (loader) on /dev/sdb1
+    done
+    最后第二行，就是配置windows10的引导项.
 
-cat test.txt | sed '2d' 删除第2行
-cat test.txt | sed '2d;3d' 删除第2行和第3行
-cat test.txt | sed '2,4d' 删除第2~4行
-cat test.txt | sed '2,$d' 删除第2~最后1行
-cat test.txt | sed -n '2p' 只要第2行
+    ls *.ko | xargs -I {} cp {} /lib/modules
 
-$(test)， 表示执行test命令并接收返回值
-${test}，便是test这个变量的内容
+    cat test.txt | sed '2d' 删除第2行
+    cat test.txt | sed '2d;3d' 删除第2行和第3行
+    cat test.txt | sed '2,4d' 删除第2~4行
+    cat test.txt | sed '2,$d' 删除第2~最后1行
+    cat test.txt | sed -n '2p' 只要第2行
 
+    $(test)， 表示执行test命令并接收返回值
+    ${test}，便是test这个变量的内容
 
-# 查看本地化设置
-localectl
+## 查看本地化设置
 
-# 设置本地化参数
+    localectl
 
-	sudo localectl set-locale LANG=zh_CN.UTF-8
-	sudo localectl set-keymap zh_CN
+## 设置本地化参数
 
-	sudo vim /var/lib/locales/supported.d/local
-	zh_CN.GBK GBK
-	zh_CN.GB2312 GB2312
-	zh_CN.GB18030 GB18030
+    sudo localectl set-locale LANG=zh_CN.UTF-8
+    sudo localectl set-keymap zh_CN
 
-	使其生效：
-	sudo dpkg-reconfigure locales
+    sudo vim /var/lib/locales/supported.d/local
+    zh_CN.GBK GBK
+    zh_CN.GB2312 GB2312
+    zh_CN.GB18030 GB18030
 
-# unzip乱码问题
+    使其生效：
+    sudo dpkg-reconfigure locales
 
-	UNZIP="-O CP936"
-	ZIPINFO="-O CP936"
+## unzip乱码问题
 
-	unzip -O CP936 fileName
+    UNZIP="-O CP936"
+    ZIPINFO="-O CP936"
 
-# 显示当前主机的信息
+    unzip -O CP936 fileName
 
-	hostnamectl
+## 显示当前主机的信息
 
-# 设置主机名
+    hostnamectl
 
-	sudo hostnamectl set-hostname rhel7
+## 设置主机名
 
-# 列出当前session
-$ loginctl list-sessions
+    sudo hostnamectl set-hostname rhel7
 
-# 列出当前登录用户
-$ loginctl list-users
+## 列出当前session
 
-# 列出显示指定用户的信息
-$ loginctl show-user ruanyf
+    $ loginctl list-sessions
 
-# 查看启动耗时
-$ systemd-analyze
+## 列出当前登录用户
 
-# 查看每个服务的启动耗时
-$ systemd-analyze blame
+    $ loginctl list-users
 
-# 显示瀑布状的启动过程流
-$ systemd-analyze critical-chain
+## 列出显示指定用户的信息
 
-# 显示指定服务的启动流
-$ systemd-analyze critical-chain atd.service
+    $ loginctl show-user ruanyf
 
+## 查看启动耗时
 
-# 给当前用户追加dialout用户组
+    $ systemd-analyze
 
-	sudo usermod -a -G dialout,sudo,adm $USER
+## 查看每个服务的启动耗时
 
-# 重命名
+    $ systemd-analyze blame
 
-	rename 原字符串 目标字符串 文件
-	rename main1.c main.c main1.c: 把main1.c替换成main.c
-	rename "s/笔记-//" *: 去掉文件名中的'笔记-'
+## 显示瀑布状的启动过程流
 
+    $ systemd-analyze critical-chain
 
-## 无法获得锁 /var/lib/apt/lists/lock:
+## 显示指定服务的启动流
+
+    $ systemd-analyze critical-chain atd.service
+
+## 给当前用户追加dialout用户组
+
+    sudo usermod -a -G dialout,sudo,adm $USER
+
+## 重命名
+
+    rename 原字符串 目标字符串 文件
+    rename main1.c main.c main1.c: 把main1.c替换成main.c
+    rename "s/笔记-//" *: 去掉文件名中的'笔记-'
+
+## 无法获得锁 /var/lib/apt/lists/lock
+
     sudo rm /var/lib/apt/lists/lock
     sudo rm /var/cache/apt/archives/lock
 
-## 认证失败:
-	sudo adduser "$USER" netdev
+## 认证失败
 
+	sudo adduser "$USER" netdev
 
 ## dd命令创建虚拟设备文件
 
@@ -734,29 +829,27 @@ $ systemd-analyze critical-chain atd.service
 		User git
 		ProxyCommand nc -v -x 127.0.0.1:1080 %h %p
 
-
 ## install boot-repair
-```sh
-# 添加软件源并更新
-sudo add-apt-repository ppa:yannubuntu/boot-repair &&　apt-get update
-＃　安装boot-repair并启动软件
-sudo apt install -y boot-repair && boot-repair
-```
+
+    # 添加软件源并更新
+    sudo add-apt-repository ppa:yannubuntu/boot-repair &&　apt-get update
+    ＃　安装boot-repair并启动软件
+    sudo apt install -y boot-repair && boot-repair
 
 ## pip 升级问题
-```
-Traceback (most recent call last):
-  File "/usr/bin/pip3", line 9, in <module>
-    from pip import main
-ImportError: cannot import name 'main'
 
-curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
-```
+    Traceback (most recent call last):
+    File "/usr/bin/pip3", line 9, in <module>
+        from pip import main
+    ImportError: cannot import name 'main'
+
+    curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
 
 ## pip setuptools 版本太低
-```
-pkg_resources.VersionConflict: (setuptools 20.7.0 (/usr/lib/python3/dist-packages), Requirement.parse('setuptools>=40.0'))
-pip3 install -U --user setuptools
-```
+
+    pkg_resources.VersionConflict: (setuptools 20.7.0 (/usr/lib/python3/dist-packages), Requirement.parse('setuptools>=40.0'))
+    pip3 install -U --user setuptools
+
 ## 更改硬件时间
+
     timedatectl set-local-rtc 1 --adjust-system-clock

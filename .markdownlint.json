@@ -1,0 +1,14 @@
+{
+    "default": true,
+    "MD007": { "indent": 4 },
+    "no-hard-tabs": false,
+    "no-inline-html": {
+        "allowed_elements": [
+            "img",
+            "div",
+            "center"
+        ]
+    },
+    "line-length": false,
+    "commands-show-output":false
+}
