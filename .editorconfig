@@ -10,7 +10,7 @@ insert_final_newline = true
 [*.{c,cpp,h,hpp,md,yaml}]
 indent_style = tab
 
-[{CMakeLists.txt,*.cmake}]
+[{CMakeLists.txt,*.cmake,Makefile}]
 indent_style = tab
 
 [*.md]

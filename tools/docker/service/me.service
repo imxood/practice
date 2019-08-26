@@ -3,7 +3,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/docker-compose -f /home/maxu/develop/sources/practice/tools/docker/service/docker-compose.yml up
+ExecStart=/usr/bin/docker-compose -f /home/maxu/develop/sources/practice/tools/docker/service/docker-compose.yml up -d
 
 [Install]
 WantedBy=multi-user.target

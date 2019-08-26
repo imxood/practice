@@ -1,5 +1,5 @@
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$PATH"
 
 export http_proxy=http://127.0.0.1:1081
 export https_proxy=http://127.0.0.1:1081
@@ -24,5 +24,5 @@ export ZEPHYR_SDK_INSTALL_DIR=~/programs/zephyr-sdk
 . ~/develop/sources/zephyrproject/zephyr/zephyr-env.sh
 
 
-#eval "$(pyenv virtualenv-init - || true)"
-#export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+eval "$(pyenv activate py3.7 || true)"
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
