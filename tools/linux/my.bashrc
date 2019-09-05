@@ -25,5 +25,9 @@ export ZEPHYR_SDK_INSTALL_DIR=$HOME/programs/zephyr-sdk
 . $HOME/develop/sources/zephyrproject/zephyr/zephyr-env.sh
 
 
-# eval "$(pyenv activate py3.7 || true)"
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+export PATH="/home/mx/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+
+export PYTHON_BUILD_ARIA2_OPTS="-x 10 -k 1M"
