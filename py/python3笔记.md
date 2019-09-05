@@ -1,27 +1,52 @@
 # python3 笔记
 
-len(obj), 计算字符串, 列表, 元组, 字典等类型的长度
+## python库
 
-type(obj), 判断对象的类型
+- readchar, 读取键盘输入的通用库
+- fabric, paramiko
+    execute shell commands remotely over SSH
 
-isinstance(obj, class_name), 判断是否是指定类型的变量
+## python环境
 
-## 字符串常见用法
+### install lastest pip
 
-## 元组
+    curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
 
-## 字典
+### install python
 
-## 列表
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt update && sudo apt install -y python3.7
 
-## json
+    cd /usr/lib/python3/dist-packages
+    sudo ln -s apt_pkg.cpython-{35m,37m}-x86_64-linux-gnu.so
 
-## shutil
+    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.5 1
+    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 2
 
-    shutil.copytree(src, dst, symlinks=False), 复制目录
-    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('*~', '*.pyc')), 忽略指定类型的文件
+    sudo update-alternatives --config python3
 
-## 搜索包是否被安装
+### source install python3.6
+
+    wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tar.xz
+    tar -xvf Python-3.6.2.tar.xz
+    cd Python-3.6.2
+    ./configure
+    make
+    make install
+
+### 使用pyenv管理python
+
+    sudo apt-get install --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
+    curl https://pyenv.run | bash
+
+    pyenv install -v -g 3.7.4
+
+    pyenv virtualenv 3.7.4-debug py3.7
+
+    pyenv activate py3.7
+
+### 搜索包是否被安装
 
 方法1:
 
@@ -36,7 +61,30 @@ isinstance(obj, class_name), 判断是否是指定类型的变量
 
     dists = [d for d in pkg_resources.working_set]
 
-## python 版本
+## python开发笔记
+
+len(obj), 计算字符串, 列表, 元组, 字典等类型的长度
+
+type(obj), 判断对象的类型
+
+isinstance(obj, class_name), 判断是否是指定类型的变量
+
+### 字符串常见用法
+
+### 元组
+
+### 字典
+
+### 列表
+
+### json
+
+### shutil
+
+    shutil.copytree(src, dst, symlinks=False), 复制目录
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('*~', '*.pyc')), 忽略指定类型的文件
+
+### python 版本
 
     os.name, 当前操作系统的类型，当前只注册了3个值：posix , nt , java, (linux/windows/java虚拟机)
 

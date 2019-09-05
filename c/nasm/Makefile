@@ -1,15 +1,10 @@
-all:
-	nasm -felf64 *.asm
-	gcc -m64 -c -g *.c
-	ld -m elf_x86_64 *.o
+.PHONY: all clean asm
+
+all: asm
 
 asm:
-	nasm -felf64 *.asm
-	gcc -m64 -c -g *.c
-	gcc *.o -o a.out
-	objdump -d a.out > asm.lst
+	nasm -felf64 hello.asm && ld hello.o -o hello.bin
+	nasm -felf64 puts.asm && gcc -no-pie puts.o -o puts.bin
 
 clean:
-	rm -f *.o *.s *.lst a.out
-
-.PHONY: all clean asm
+	rm -f *.o *.s *.lst *.bin a.out
