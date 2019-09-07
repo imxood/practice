@@ -1,5 +1,9 @@
 # Linux笔记
 
+## linux 批量重命名
+
+rename -v 's/.asm/.nasm/' *.asm
+
 ## 防火墙规则
 
 <center><img src="imgs/iptables_rule.jpg"/></center>
