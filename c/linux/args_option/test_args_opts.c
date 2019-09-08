@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#define USAGE "-h                     | --help      \n"
+
 int main(int argc, char **argv)
 {
 	const char *short_options = "vhVo:";
@@ -14,12 +16,6 @@ int main(int argc, char **argv)
 		{"output", optional_argument, NULL, 'o'},
 		{NULL, 0, NULL, 0}, /*Require daten do farray.*/
 	};
-
-	const usage = 	"-s SPEED               | --speed SPEED \n"
-					"-m MODE                | --mode MODE \n"
-					"-b BAUDRATE            | --baudrate BAUDRATE \n"
-					"-f FRAME-DELAY-TIME_MS | --frame-delay FRAME-DELAY-TIME_MS \n"
-					"-l LOOP_COUNT          | --loop LOOP_COUNT \n";
 
 	int c;
 
@@ -33,7 +29,7 @@ int main(int argc, char **argv)
 		switch (c)
 		{
 		case 'h':
-			printf(usage);
+			printf(USAGE);
 			exit(0);
 
 		case 'v':
@@ -56,8 +52,6 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
-
-	printf("ret: %d\n", c);
 
 	return 0;
 }

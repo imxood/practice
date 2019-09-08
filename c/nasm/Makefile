@@ -1,15 +1,11 @@
-.PHONY: all clean asm
+.PHONY: all clean
 
-all: asm
+all:
+	nasm -f elf -gdwarf -l hello.lst hello.nasm && gcc -m32 hello.o -o hello.bin
 
-asm:
-	nasm -felf64 hello.nasm && ld hello.o -o hello.bin
-	nasm -felf64 puts.nasm && gcc -no-pie puts.o -o puts.bin
-	nasm -felf64 fib.nasm && gcc -no-pie fib.o -o fib.bin
+	nasm -f elf -gdwarf -l test_callstack.lst test_callstack.nasm && gcc -m32 -no-pie test_callstack.o -o test_callstack.bin
 
-	nasm -felf64 maxofthree.nasm && gcc -no-pie maxofthree.o callmaxofthree.c -o maxofthree.bin
-
-	nasm -felf64 -l test_addr.lst test_addr.nasm && gcc -no-pie test_addr.o -o test_addr.bin
+	gcc -masm=intel -S -o disassembly.s disassembly.c
 
 clean:
-	rm -f *.o *.s *.lst *.bin a.out
+	rm -f *.o *.s *.lst *.bin *.log a.out

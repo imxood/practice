@@ -49,7 +49,7 @@ message("fname: ${fname}, prefix: ${prefix}")
 
 
 # 添加一个可执行程序
-add_executable(hello hello.c)
+add_executable(hello test_build.c)
 
 
 

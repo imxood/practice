@@ -2,6 +2,7 @@
 *.bin
 *.lst
 *.out
+c/**/*.s
 
 
 *.pyc
