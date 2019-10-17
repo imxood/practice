@@ -1,42 +1,11 @@
 
 import os
 import sys
-import configparser as cp
-import paramiko
-import getpass
-import re
+from paramiko import SSHClient, AutoAddPolicy
 import time
 import logging
 import threading
 from contextlib import contextmanager
-
-from fabric import Connection
-
-
-script_path = os.path.abspath(os.path.dirname(__file__))
-
-
-def get_device_config(config_file, device_index):
-
-    if not os.path.isfile(config_file):
-        self.log.error("file[%s] didn't exist" % config_file)
-        sys.exit(-1)
-
-    config = cp.ConfigParser()
-    config.read(config_file)
-
-    sections = config.sections()
-
-    if device_index + 1 > len(sections):
-        log.error('device index error')
-        log.warning('The optional device are:')
-        for index, device in enumerate(sections):
-            log.info('index: {}, device name: {}'.format(index, device))
-        return None
-
-    device = sections[device_index]
-
-    return config[device]
 
 
 class ExceptionHandlingThread(threading.Thread):
@@ -66,7 +35,7 @@ class ExceptionHandlingThread(threading.Thread):
             print(msg.format(self.exc_info[1], name))  # noqa
 
 
-class Runner(object):
+class Runner:
 
     read_chunk_size = 1000
 
@@ -84,24 +53,17 @@ class Runner(object):
             data = reader(self.read_chunk_size)
             if not data:
                 break
-            yield self.decode(data)
+            yield data.decode('utf-8', "replace")
 
     def write_our_output(self, stream, string):
-        stream.write(encode_output(string, self.encoding))
+        stream.write(string)
         stream.flush()
 
     def _handle_output(self, buffer_, hide, output, reader):
-        # TODO: store un-decoded/raw bytes somewhere as well...
         for data in self.read_proc_output(reader):
             if not hide:
                 self.write_our_output(stream=output, string=data)
-            # Store in shared buffer so main thread can do things with the
-            # result after execution completes.
-            # NOTE: this is threadsafe insofar as no reading occurs until after
-            # the thread is join()'d.
             buffer_.append(data)
-            # Run our specific buffer through the autoresponder framework
-            self.respond(buffer_)
 
     def handle_stdout(self, buffer_, hide, output):
         self._handle_output(
@@ -141,35 +103,32 @@ class Remote(Runner):
         return self.channel.recv_exit_status()
 
     def stop(self):
-        if hasattr(self, "channel"):
-            self.channel.close()
+        self.channel.close()
 
 
 class RemoteShell:
 
-    def __init__(self, host=None, user=None, password=None, port=None, log=None):
+    def __init__(self, hostname='127.0.0.1', port=22, username='root', password=None, log=None):
 
-        self.user = user
-        self.password = password
-        self.host = host
-        self.port = port if port is None else int(port)
+        self.connect_kwargs = dict(
+            hostname=hostname,
+            port=port,
+            username=username,
+            password=password
+        )
 
         self.log = log if log is not None else logging.getLogger(__name__)
-
         self.command_cwds = list()
 
     def __enter__(self):
 
-        self.ssh_client = paramiko.SSHClient()
-        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_client.connect(self.host, self.port, self.user, self.password)
+        self.client = SSHClient()
+        self.client.set_missing_host_key_policy(AutoAddPolicy())
 
-        self.sftp = paramiko.SFTPClient.from_transport(
-            self.ssh_client.get_transport()
-        )
+        self.transport = None
+        self._sftp = None
 
-        # stdin, stdout, stderr = self.ssh_client.exec_command('pwd')
-        # self.path = stdout.read().decode().strip()
+        self.client.connect('127.0.0.1', port=2222, username='root')
 
         self.log.debug('ssh shell __enter__')
 
@@ -179,13 +138,26 @@ class RemoteShell:
         self.close()
         self.log.debug('ssh shell __exit__')
 
+    def _open(self):
+        if self.is_connected:
+            return
+        self.client.connect(**self.connect_kwargs)
+        self._transport = self.client.get_transport()
+
     @contextmanager
-    def cd(where):
+    def cd(self, path):
         self.command_cwds.append(path)
         try:
             yield
         finally:
             self.command_cwds.pop()
+
+    @property
+    def sftp(self):
+        self._open()
+        if self._sftp is None:
+            self._sftp = self.client.open_sftp()
+        return self._sftp
 
     @property
     def cwd(self):
@@ -210,7 +182,7 @@ class RemoteShell:
             self.log.debug('transfer failed! {}'.format(e))
             return (-1, 'transfer failed!', '')
 
-    def put(self, recursive, local_file='', remote_file=''):
+    def put(self, local_file='', remote_file='', recursive=False):
         try:
             self.sftp.put(local_file, remote_file)
             self.log.debug("transfer successed!")
@@ -219,29 +191,31 @@ class RemoteShell:
             self.log.debug('transfer failed! {}'.format(e))
             return (-1, 'transfer failed!', '')
 
-    def run(self, cmd):
+    def run(self, cmd, hide=False):
+
+        self._open()
 
         command = self._prefix_commands(cmd)
 
-        channel = self.ssh_client.get_transport().open_session()
+        channel = self.client.get_transport().open_session()
 
-        r = Remote()
-        r.start(command, channel)
+        remote = Remote()
+        remote.start(command, channel)
 
         thread_args = dict()
 
         output = []
         error = []
 
-        thread_args[r.handle_stdout] = {
+        thread_args[remote.handle_stdout] = {
             'buffer_': output,
-            'hide': False,
+            'hide': hide,
             'output': sys.stdout
         }
 
-        thread_args[r.handle_stderr] = {
+        thread_args[remote.handle_stderr] = {
             'buffer_': error,
-            'hide': False,
+            'hide': hide,
             'output': sys.stderr
         }
 
@@ -250,67 +224,37 @@ class RemoteShell:
             t.start()
 
         while True:
-            if r.process_is_finished:
+            if remote.process_is_finished:
                 break
             time.sleep(0.01)
 
-        return (r.returncode, output, error)
+        return (remote.returncode, ''.join(output), ''.join(error))
 
-        # buff_size = 10240000
-        # exit_status = 0
-
-        # channel.get_pty()
-
-        # channel.exec_command(cmd)
-
-        # while not channel.exit_status_ready():
-
-        #     time.sleep(0.001)
-
-        #     if not channel.recv_ready() and not channel.recv_stderr_ready():
-        #         continue
-
-        #     while channel.recv_ready():
-        #         out = channel.recv(buff_size).decode()
-        #         handle_log(out)
-
-        #     while channel.recv_stderr_ready():
-        #         out = channel.recv_stderr(buff_size).decode()
-        #         handle_error_log(out)
-        #         exit_status = -2
+    @property
+    def is_connected(self):
+        return self.transport.active if self.transport else False
 
     def close(self):
-        self.ssh_client.close()
+        if self.is_connected:
+            self.client.close()
 
     def _prefix_commands(self, command):
-        if self.cwd:
-            return 'cd {} && '.format(self.cwd)
-        return ''
+        return 'cd {} && {}'.format(self.cwd, command)
 
 
 def test():
 
-    config_file = os.path.join(script_path, 'tools/remote/config.conf')
-
-    config = cp.ConfigParser()
-    config.read(config_file)
-
-    device_config = config['pi_dengwei']
-
-    host = device_config['host']
-    port = device_config['port']
-    user = device_config['user']
-    password = device_config['password']
-
-    with RemoteShell(host, user, password, port) as s:
-        s.run('ls')
+    with RemoteShell() as s:
+        s.run('ls -al')
+        with s.cd('test1'):
+            s.run('ls -al')
+            with s.cd('test2'):
+                s.run('ls -al')
+                with s.cd('test3'):
+                    s.run('ls -al', hide=True)
         s.run('dmesg')
+        # s.sftp.mkdir('test1_1')
 
-    # scp = RemoteScp(user, password, host, port)
-    # scp.put('/home/mx/work/cvf/pse/modules/pse_validation/tools/flash.sh',
-    #         '/home/pi/maxu/flash.sh.1')
-    # scp.get('/home/pi/maxu/flash.sh.1',
-    #         '/home/mx/work/cvf/pse/modules/pse_validation/tools/flash.sh.2')
 
 if __name__ == "__main__":
 
