@@ -7,5 +7,14 @@ all:
 
 	gcc -masm=intel -S -o disassembly.s disassembly.c
 
+
+bootloader_hello: bootloader_hello.nasm
+# 生成开机引导程序
+	nasm -f bin bootloader_hello.nasm -o $@.bin
+# 以十六进制输出文件内容
+	@echo ""
+	@hexdump bootloader_hello.bin
+
+
 clean:
 	rm -f *.o *.s *.lst *.bin *.log a.out
