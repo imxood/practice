@@ -10,16 +10,16 @@ from subprocess import Popen, PIPE
 import signal
 
 
-class ExceptionHandlingThread(threading.Thread):
+class ExceptionHandleThread(threading.Thread):
 
     def __init__(self, **kwargs):
-        super(ExceptionHandlingThread, self).__init__(**kwargs)
+        super(ExceptionHandleThread, self).__init__(**kwargs)
         self.daemon = True
         self.kwargs = kwargs
 
     def run(self):
         try:
-            super(ExceptionHandlingThread, self).run()
+            super(ExceptionHandleThread, self).run()
         except BaseException:
             self.exc_info = sys.exc_info()
             msg = "Encountered exception {!r} in thread for {!r}"
@@ -100,7 +100,7 @@ class Runner:
         }
 
         for target, kwargs in thread_args.items():
-            t = ExceptionHandlingThread(target=target, kwargs=kwargs)
+            t = ExceptionHandleThread(target=target, kwargs=kwargs)
             t.start()
 
         while True:

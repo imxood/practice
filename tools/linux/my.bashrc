@@ -1,8 +1,8 @@
 
 export PATH="$PATH"
 
-#export http_proxy=http://127.0.0.1:1081
-#export https_proxy=http://127.0.0.1:1081
+export http_proxy=http://127.0.0.1:1081
+export https_proxy=http://127.0.0.1:1081
 
 arm_none_eabi_gdb=$HOME/programs/gcc-arm-none-eabi-8-2019-q3-update
 export PATH=$arm_none_eabi_gdb/bin:$PATH

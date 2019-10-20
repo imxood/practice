@@ -102,6 +102,9 @@ class PathView(MethodView):
 
         return res
 
+    def post(self, p=''):
+        pass
+
 
 path_view = PathView.as_view('path_view')
 app.add_url_rule('/', view_func=path_view)
