@@ -118,7 +118,7 @@ class Local(Runner):
     def __init__(self, *args, **kwargs):
         super(Local, self).__init__(*args, **kwargs)
 
-    def start(self, command, hide, env=None):
+    def run(self, command, hide, env=None):
         self.process = Popen(
             command,
             shell=True,
@@ -140,7 +140,7 @@ class Local(Runner):
 
     @property
     def process_is_finished(self):
-        if self.process.poll():
+        if self.process.poll() is None:
             return False
         return True
 
@@ -154,7 +154,7 @@ class Remote(Runner):
     def __init__(self, *args, **kwargs):
         super(Remote, self).__init__(*args, **kwargs)
 
-    def start(self, command, channel, hide):
+    def run(self, command, channel, hide):
         self.channel = channel
         self.channel.exec_command(command)
         super()._run(hide)
@@ -190,6 +190,9 @@ class RemoteShell:
 
         self.log = log if log is not None else logging.getLogger(__name__)
         self.command_cwds = list()
+        
+        self.local_runner = Local()
+        self.remote_runner = Remote()
 
     def __enter__(self):
 
@@ -306,8 +309,7 @@ class RemoteShell:
         '''
         command = cmd
 
-        local = Local()
-        local.start(command, hide)
+        self.local_runner.run(command, hide)
 
     def remote(self, cmd, hide=False):
         '''run remote command
@@ -318,8 +320,7 @@ class RemoteShell:
 
         channel = self.client.get_transport().open_session()
 
-        remote = Remote()
-        remote.start(command, channel, hide)
+        self.remote_runner.run(command, channel, hide)
 
     @property
     def is_connected(self):
