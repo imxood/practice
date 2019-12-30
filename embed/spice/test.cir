@@ -1,0 +1,15 @@
+SPICE TEST
+
+* PULSE (-Vs +Vs TD TR TF PW PER)
+vin 7 0 pulse (-220v 220v 0 1ns 1ns 100us 200us)
+
+r1 7 5 2
+l1 5 3 50uh
+ci 3 0 10uf
+
+.tran 1us 400us
+.plot tran v(3) i(r1)
+.four 5khz v(3)
+.probe
+
+.end

@@ -20,3 +20,6 @@ password
 linux*.tar.gz
 *.img
 initrd
+
+
+package-lock.json
