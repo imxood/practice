@@ -32,6 +32,10 @@ title = "web"
     ISSUE: You need to have Ruby and Sass installed and in your PATH for this task to work.
     SOLVED: yarn add --save node-sass grunt-sass
 
+## yarn 常见用法
+
+    yarn global add typescript
+
 
 ### 使用npm安装cordova，执行cordova create报错
     npm ERR! not a package.........@cordova-app-hello-world\index.js

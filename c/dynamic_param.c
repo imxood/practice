@@ -1,42 +1,62 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 
-static char CASE_NAME_BUFFER[128];
-static char CASE_NAME_ARGS[128];
+#define CASE_NAME_BUF_LENGTH 128
 
-static char *INT_CAT(int argc, ...)
+static char CASE_NAME_BUF[CASE_NAME_BUF_LENGTH];
+static char CASE_NAME_INT_BUF[CASE_NAME_BUF_LENGTH];
+
+static int CHAR_pos;
+
+const char *CHAR(int number)
 {
-	static volatile unsigned char pos = 0;
+	char *buffer = CASE_NAME_INT_BUF + CHAR_pos;
 
-	char *init_buffer = CASE_NAME_ARGS + pos;
-	char *buffer = init_buffer;
+	sprintf(buffer, "%d", number);
 
-	char *arg = NULL;
+	uint32_t len = strlen(buffer);
+	buffer[len] = 0;
 
-	va_list valist;
-	va_start(valist, argc);
+	CHAR_pos += len + 1;
 
-	for (int i = 0; i < argc; i++)
-	{
-		int arg = va_arg(valist, int);
-		sprintf(buffer, "%d", arg);
-		pos += strlen(buffer);
-		buffer += strlen(buffer);
-		*buffer = '_';
-		buffer++;
-	}
-
-	buffer--;
-	*buffer = '\0';
-
-	return init_buffer;
+	return buffer;
 }
 
-static char *CASE_NAME(int argc, ...)
+const char *CHAR_BASE(int number, int base)
 {
-	char *buffer = CASE_NAME_BUFFER;
+	char *buffer = CASE_NAME_INT_BUF + CHAR_pos;
+
+	if (base == 16)
+	{
+		sprintf(buffer, "0x%x", number);
+	}
+	else if (base == 10)
+	{
+		sprintf(buffer, "%d", number);
+	}
+	else if (base == 8)
+	{
+		sprintf(buffer, "0o%o", number);
+	}
+	else
+	{
+		return "INVALIDATEBASE";
+	}
+
+	uint32_t len = strlen(buffer);
+	buffer[len] = 0;
+
+	CHAR_pos += len + 1;
+
+	return buffer;
+}
+
+const char *CASE_NAME(int argc, ...)
+{
+	char *buffer = CASE_NAME_BUF;
 	char *arg = NULL;
 
 	va_list valist;
@@ -44,35 +64,26 @@ static char *CASE_NAME(int argc, ...)
 
 	for (int i = 0; i < argc; i++)
 	{
-		char *arg = va_arg(valist, char *);
+		arg = va_arg(valist, char *);
 		strcpy(buffer, arg);
 		buffer += strlen(arg);
-		*buffer = '_';
+		*buffer = '-';
 		buffer++;
 	}
 
-	buffer--;
-	*buffer = '\0';
+	*(--buffer) = '\0';
 
-	return CASE_NAME_BUFFER;
+	return CASE_NAME_BUF;
 }
 
 int main(int argc, char const *argv[])
 {
-	char *name = NULL;
+	const char *name = CASE_NAME(7, __func__, CHAR(0), CHAR_BASE(0x01, 16), CHAR(0x10), CHAR(0x10), CHAR(0x10), CHAR(0x10));
 
-	name = INT_CAT(2, 11, 22);
+	// name = CASE_NAME(3, "hello", "world", INT_CAT(2, 1, 2));
 	printf("%s\n", name);
 
-	name = INT_CAT(4, 1, 2, 3, 4);
-	printf("%s\n", name);
-
-	name = CASE_NAME(3, "hello", "world", "1");
-	printf("%s\n", name);
-
-	name = CASE_NAME(3, "hello", "world", INT_CAT(2, 1, 2));
-	printf("%s\n", name);
-
+	CHAR_pos = 0;
 
 	return 0;
 }

@@ -9,12 +9,19 @@ import json
 import mimetypes
 import sys
 from pathlib2 import Path
+from argparse import ArgumentParser
+
+
+def parse_args():
+    parser = ArgumentParser()
+    parser.add_argument("--log_path", help="set log server's log path", metavar="FILE")
+    return parser.parse_args()
+
 
 app = Flask(__name__, static_url_path='/assets', static_folder='assets')
-root = os.path.normpath("/tmp")
-key = ""
+root = '.'
 
-datatypes = {'audio': 'm4a,mp3,oga,ogg,webma,wav', 'archive': '7z,zip,rar,gz,tar', 'image': 'gif,ico,jpe,jpeg,jpg,png,svg,webp', 'pdf': 'pdf', 'quicktime': '3g2,3gp,3gp2,3gpp,mov,qt', 'source': 'atom,bat,bash,c,cmd,coffee,css,hml,js,json,java,less,markdown,md,php,pl,py,rb,rss,sass,scpt,swift,scss,sh,xml,yml,plist', 'text': 'txt', 'video': 'mp4,m4v,ogv,webm', 'website': 'htm,html,mhtm,mhtml,xhtm,xhtml'}
+datatypes = {'text': 'txt'}
 icontypes = {'icon-jfi-file-text': 'txt,log'}
 
 
@@ -73,6 +80,20 @@ class PathView(MethodView):
             contents = []
             total = {'size': 0, 'dir': 0, 'file': 0}
 
+            if p:
+
+                stat_res = os.stat('..')
+
+                info = {}
+                info['name'] = '..'
+                info['mtime'] = stat_res.st_mtime
+                ft = get_type(stat_res.st_mode)
+                info['type'] = ft
+                sz = stat_res.st_size
+                info['size'] = sz
+
+                contents.append(info)
+
             for filename in os.listdir(path):
 
                 filepath = os.path.join(path, filename)
@@ -93,14 +114,30 @@ class PathView(MethodView):
 
             page = render_template('index.html', path=p,
                                    total=total, contents=contents)
-            res = make_response(page, 200)
+            return make_response(page, 200)
 
-        elif os.path.isfile(path):
+        else:
 
-            res = send_file(path)
-            res.headers.add('Content-Disposition', 'attachment')
+            print('path: ', path)
 
-        return res
+            mime = mimetypes.guess_type(path)
+            print('mime: ', mime)
+
+            filetype = mime[0].split('/')[0]
+            print('filetype: ', filetype)
+
+            filename = os.path.basename(path)
+
+            if filename == 'favicon.ico':
+                return Response('', mimetype='text/plain')
+
+            if filetype == 'text':
+                with open(path, 'r') as f:
+                    return Response(f.read(), mimetype='text/plain')
+            else:
+                res = send_file(path)
+                res.headers.add('Content-Disposition', 'attachment')
+                return res
 
     def post(self, p=''):
         pass
@@ -111,5 +148,14 @@ app.add_url_rule('/', view_func=path_view)
 app.add_url_rule('/<path:p>', view_func=path_view)
 
 
-if __name__ == '__main__':
-    app.run('127.0.0.1', '8000', threaded=True, debug=True)
+def main():
+
+    global root
+
+    options = parse_args()
+    print(options)
+
+    if options.log_path:
+        root = options.log_path
+
+    app.run('0.0.0.0', '8000', threaded=True, debug=False)

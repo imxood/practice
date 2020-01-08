@@ -8,6 +8,13 @@
 
 ## python环境
 
+### vscode调试python多进程
+
+    multiprocessing.set_start_method('spawn', True)
+
+    在launch.json文件中添加:
+        "subProcess": true
+
 ### install lastest pip
 
     curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
@@ -88,7 +95,7 @@ isinstance(obj, class_name), 判断是否是指定类型的变量
 
     os.name, 当前操作系统的类型，当前只注册了3个值：posix , nt , java, (linux/windows/java虚拟机)
 
-    sys.platform, "linux"
+    sys.platform, "linux", "win32"
 
     platform.system(), 系统名称('Linux', 'Windows', or 'Java'): 'Linux', 如果无法确定就返回None
 
