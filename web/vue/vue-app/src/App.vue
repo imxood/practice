@@ -1,17 +1,19 @@
 <template>
-  <div id="app">
-    <Home msg="Welcome to Your Vue.js App" />
-  </div>
+    <div id="app">
+        <!-- <Home msg="Welcome to Your Vue.js App" /> -->
+		<Header></Header>
+        <router-view />
+    </div>
 </template>
 
 <script>
-import Home from "./components/Home.vue";
+import Header from "./components/Header.vue";
 
 export default {
-  name: "app",
-  components: {
-    Home
-  }
+    name: "app",
+    components: {
+        Header
+    }
 };
 </script>
 

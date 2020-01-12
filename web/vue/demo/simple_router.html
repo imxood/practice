@@ -34,6 +34,10 @@
 	const Foo = { template: '<div>foo</div>' }
 	const Bar = { template: '<div>bar</div>' }
 
+	const User = {
+		template: '<div>User {{ $route.params.id }}</div>'
+	}
+
 	// 2. 定义路由
 	// 每个路由应该映射一个组件。 其中"component" 可以是
 	// 通过 Vue.extend() 创建的组件构造器，
@@ -41,7 +45,9 @@
 	// 我们晚点再讨论嵌套路由。
 	const routes = [
 		{ path: '/foo', component: Foo },
-		{ path: '/bar', component: Bar }
+		{ path: '/bar', component: Bar },
+		// 动态路径参数 以冒号开头
+		{ path: '/user/:id', component: User }
 	]
 
 	// 3. 创建 router 实例，然后传 `routes` 配置

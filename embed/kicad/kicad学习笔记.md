@@ -1,10 +1,21 @@
 # kicad 学习笔记
 
-## 安装kicad
+## apt安装kicad
 
 sudo add-apt-repository ppa:js-reynaud/kicad-5.1
 sudo apt-get update
 sudo apt install kicad kicad-locale-zh kicad-doc-zh kicad-demos kicad-symbols kicad-packages3d kicad-templates kicad-footprints kicad-libraries
+
+## source安装kicad
+
+    # python-pip libgtk-3-dev python-wxtools
+    sudo apt install libglew-dev libglm-dev libcurl4-openssl-dev libboost-all-dev liboce-ocaf-dev swig libwxgtk3.0-gtk3-dev python-wxgtk3.0-dev libssl-dev doxygen ninja-build
+
+    # pip2 install --user setuptools wxpython
+
+    mkdir -p output/debug
+    cd output/debug
+    cmake -DCMAKE_BUILD_TYPE=Debug -DKICAD_SCRIPTING=ON -G Ninja ../..
 
 # kicad入门
 
@@ -16,12 +27,11 @@ sudo apt install kicad kicad-locale-zh kicad-doc-zh kicad-demos kicad-symbols ki
 
 ## 设置网格grid
     右击菜单 --> 网格 --> 设置网格，即一个grid的宽度
-    
+
     如果网格看着太密集，则设置首选项，最小网格间距为100
 ![](images/2019-11-20-22-32-26.png)
 
 ## 基本用法
-
 
     m
     移动，不保持连接
@@ -77,7 +87,7 @@ sudo apt install kicad kicad-locale-zh kicad-doc-zh kicad-demos kicad-symbols ki
     ~~, 上划线
 
     Pitch, 两单元中心间距
-    
+
 
     PcbNew:
 

@@ -2,8 +2,8 @@
 *.bin
 *.lst
 *.out
-c/**/*.s
-
+*.i
+out.s
 
 *.pyc
 __pycache__
