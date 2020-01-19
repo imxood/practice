@@ -22,7 +22,7 @@
                 for sheetList:
                     for item EDA_ITEM*:
                         findNextComponentAndCreatePinList():
-                            finds a component from the DrawList and builds its pin list in m_SortedComponentPinList.
+                            m_SortedComponentPinList, 排好序的pin列表
                         更新 m_libraries
                         更新 m_spiceItems
             aFormatter->Print: ".title" ".include" device node model directives ".end"
@@ -32,9 +32,9 @@
     当添加信号onAddSignal():
         DIALOG_SIGNAL_LIST dialog.ShowModal:
             DIALOG_SIGNAL_LIST::TransferDataToWindow():
-                for net m_exporter->GetNetIndexMap(): // Voltage list
+                for net m_exporter->GetNetIndexMap(): // Voltage list, 非地的pin
                     m_signals->Append --> netname != "GND" && netname != "0": "V(%s)".format(netname)
-                for item m_exporter->GetSpiceItems():
+                for item m_exporter->GetSpiceItems(): // Current list, 所有的节点
                     for current NETLIST_EXPORTER_PSPICE_SIM::GetCurrents( item.m_primitive ):
                         m_signals->Append --> "%s(%s)".format(current, item.m_refName)
 
