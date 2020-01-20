@@ -43,4 +43,19 @@
 
         cp_vset("sharedmode", CP_BOOL, True);
 
-    cp_init
+        ft_cpinit(): Set some standard variables and aliases, etc, and init the ccom stuff
+            cp_init(); Initialize io, cp_chars[], variable "history" in init.c
+            cp_coms: 即所有的命令, 比如: print, plot, load, tran, op
+
+
+    ngSpice_Circ(netlist) 根据网表创建电路
+        create_circbyline()
+            更新circarray
+            更新完后执行inp_spsource():
+
+
+
+
+    struct CKTcircuit: 电路结构体
+
+    struct circ

@@ -118,7 +118,7 @@ sudo mkinitramfs -o ./mnt/boot/initrd
 # 使用默认配置，编译linux内核
 # https://mirrors.edge.kernel.org/pub/linux/kernel
 # https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-4.9.179.tar.gz
-aria2c -x 10 https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-4.9.179.tar.gz
+aria2c -s16 -x16 -j16 https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-4.9.179.tar.gz
 tar -xvf linux-4.9.179.tar.gz && cd linux-4.9.179
 make -C linux-4.9.179 x86_64_defconfig && make -C linux-4.9.179 bzImage -j10
 sudo cp linux-4.9.179/arch/x86/boot/bzImage mnt/boot
