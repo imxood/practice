@@ -3,6 +3,7 @@
 *.lst
 *.out
 *.i
+*.map
 out.s
 
 *.pyc
