@@ -44,16 +44,11 @@
     2. 要写入的 reg address
     3. 要写入的 data
 
-    ps: 开始信号, 发送地址+写位, 等待ack, 发送数据(每发送1个byte就会等待1个ack), 停止信号
-
 ## i2c read
 
 ![i2c read操作](images/2020-01-08-13-46-14.png)
 
     1. slave addr 和 0
-    2. 要读入的 reg address
+    2. 要读入的 reg address, 然后产生一个stop信号或者一个start信号
     3. slave addr 和 1
     4. 读
-
-    ps: 开始信号, 发送地址+写位, 发送数据(reg address), 停止信号
-        开始信号, 发送地址+读位, 读数据(每读完1个byte发送1个ack), 停止信号
