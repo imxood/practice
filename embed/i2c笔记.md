@@ -57,3 +57,21 @@
 
     ps: 开始信号, 发送地址+写位, 发送数据(reg address), 停止信号
         开始信号, 发送地址+读位, 读数据(每读完1个byte发送1个ack), 停止信号
+
+## i2c 读写 fm24v10 eeprom
+
+    slave_addr: 1010 A2 A1 A16
+        A2 A1, 对应于8pin中的A1 A2, 用于识别同一个总线上的不同fm24v10 有4种选择, A16 是页选择位
+        只有不处理A2 A1 pin的话, slave address是: 1010 00 0, 即0x50
+
+    multiple bytes write:
+        Start, slave_addr + w, addr msb, addr lsb, data byte, data byte, ...
+        example:
+            0x50, 0x00, 0x00, 0x01, 0x02, 0x03
+
+    multiple bytes read:
+        Start, slave_addr + w, addr msb, addr lsb
+        Start, slave_addr ignore X(p s) + r, read ...
+        example:
+            0x50, 0x00, 0x00
+            0x51, read 3 bytes
