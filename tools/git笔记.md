@@ -11,3 +11,8 @@
 
     git commit -m "."
     git push
+
+
+## warning: CRLF will be replaced by LF
+
+git config --global core.autocrlf false
