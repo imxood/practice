@@ -226,5 +226,8 @@ docker-compose build --no-cache --force-rm
 # 移除指定的容器
 docker-compose rm nginx
 
+# 启动systemctl
+privileged: true
+ENTRYPOINT [ "/sbin/init" ]
 
 ~~~
