@@ -1,19 +1,29 @@
 # openocd笔记
 
-openocd -f board/stm32f7discovery.cfg
+## 常用命令
 
-telnet localhost 4444
+    openocd -f board/stm32f7discovery.cfg
 
-program <filename> [address] [verify] [reset] [exit], 写可执行程序到flash上, 只有binary images才需要address
+    telnet localhost 4444
 
-    ex: program output.bin 0x08000000 reset; halt; reg; resume; exit
+    program <filename> [address] [verify] [reset] [exit], 写可执行程序到flash上, 只有binary images才需要address
 
-halt, 进入挂起状态
+        ex: program output.bin 0x08000000 reset; halt; reg; resume; exit
 
-reg [REG [value]] , 查看或设置寄存器, 可能需要在halt状态下
+    halt, 进入挂起状态
 
-resume, 恢复到当前代码段
+    reg [REG [value]] , 查看或设置寄存器, 可能需要在halt状态下
 
-reset [run|halt|init], 重置, 进入特定状态, 默认是run
+    resume, 恢复到当前代码段
 
-reg, 查看寄存器内容, 在halt状态下才会显示内容
+    reset [run|halt|init], 重置, 进入特定状态, 默认是run
+
+    reg, 查看寄存器内容, 在halt状态下才会显示内容
+
+
+## openocd实现重启到指定地址
+
+    gcc 编译选项:
+    LDFLAGS += -Wl,-Map=output.map
+
+    openocd -f board/stm32f7discovery.cfg -c "program output.bin ${flash_to_addr} reset; halt; reg pc ${reset_entry}; resume; exit"
