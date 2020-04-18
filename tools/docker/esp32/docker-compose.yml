@@ -1,0 +1,16 @@
+version: "3.5"
+
+services:
+    esp32:
+        build:
+            context: .
+        image: imxood/esp32
+        restart: unless-stopped
+        networks:
+            - mx-network
+        ports:
+            - "22:22"
+
+networks:
+    mx-network:
+        external: true

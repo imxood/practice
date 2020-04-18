@@ -2,6 +2,7 @@
 *.bin
 *.lst
 *.out
+*.exe
 *.i
 *.map
 out.s
@@ -24,3 +25,5 @@ initrd
 
 
 package-lock.json
+
+.sconsign.dblite
