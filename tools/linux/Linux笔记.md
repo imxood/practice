@@ -1,5 +1,17 @@
 # Linux笔记
 
+## issue
+    
+    maxu@maxu-pc:/media/maxu$ sudo mount -t ntfs-3g /dev/sdb4 /mnt/A/
+    The disk contains an unclean file system (0, 0).
+    Metadata kept in Windows cache, refused to mount.
+    Falling back to read-only mount because the NTFS partition is in an
+    unsafe state. Please resume and shutdown Windows fully (no hibernation
+    or fast restarting.)
+    
+    修复: sudo ntfsfix /dev/sdb4
+
+
 ## linux 批量重命名
 
 rename -v 's/.asm/.nasm/' *.asm
