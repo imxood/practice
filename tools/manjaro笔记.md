@@ -12,8 +12,7 @@
 
     换源
     
-    sudo pacman -Syy
-    sudo pacman-mirrors -i -c China -m rank  #选一个清华源就行
+    sudo pacman-mirrors -c China
     sudo pacman -Syyu
     
     sudo pacman -S vim
@@ -32,9 +31,10 @@
     sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     chsh -s /bin/zsha
     
+    # google输入法
     sudo pacman -S kcm-fcitx fcitx-googlepinyin
     
-    安装搜狗输入法
+    搜狗输入法
     sudo pacman -S fcitx-lilydjwg-git fcitx-configtool fcitx-sogoupinyin
     
     ~/.xprofile
@@ -58,3 +58,4 @@
     sudo pacman -S clang gdb
     sudo pacman -S flameshot-git
     sudo pacman -S wps-office ttf-wps-fonts
+    sudo pacman -S netease-cloud-music
