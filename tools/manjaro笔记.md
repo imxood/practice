@@ -32,16 +32,18 @@
     sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     chsh -s /bin/zsha
     
-    安装输入法
-    
-    sudo pacman -S fcitx-sogoupinyin
-    sudo pacman -S fcitx-im # 全部安装
-    sudo pacman -S fcitx-configtool # 图形化配置工具
+    安装搜狗输入法
+    sudo pacman -S fcitx-lilydjwg-git fcitx-qt5 fcitx-configtool fcitx-sogoupinyin
     
     ~/.xprofile
     export GTK_IM_MODULE=fcitx
     export QT_IM_MODULE=fcitx
     export XMODIFIERS="@im=fcitx"
+    
+    如果搜狗有问题，卸载搜狗输入法
+    sudo pacman -Rs fcitx-lilydjwg-git fcitx-configtool fcitx-sogoupinyin fcitx-qt5 kcm-fcitx
+    cd ~/.config
+    sudo rm -rf SogouPY SogouPY.users sogou-qimpanel fcitx
     
     必要软件
     
