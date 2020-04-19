@@ -32,8 +32,10 @@
     sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     chsh -s /bin/zsha
     
+    sudo pacman -S fcitx-googlepinyin
+    
     安装搜狗输入法
-    sudo pacman -S fcitx-lilydjwg-git fcitx-qt5 fcitx-configtool fcitx-sogoupinyin
+    sudo pacman -S fcitx-lilydjwg-git fcitx-configtool fcitx-sogoupinyin
     
     ~/.xprofile
     export GTK_IM_MODULE=fcitx
@@ -41,12 +43,13 @@
     export XMODIFIERS="@im=fcitx"
     
     如果搜狗有问题，卸载搜狗输入法
-    sudo pacman -Rs fcitx-lilydjwg-git fcitx-configtool fcitx-sogoupinyin fcitx-qt5 kcm-fcitx
+    sudo pacman -Rs fcitx-lilydjwg-git fcitx-configtool fcitx-sogoupinyin
     cd ~/.config
-    sudo rm -rf SogouPY SogouPY.users sogou-qimpanel fcitx
+    rm -rf SogouPY SogouPY.users sogou-qimpanel fcitx
     
     必要软件
     
+    sudo pacman -S docker docker-compose
     sudo pacman -S visual-studio-code-bin
     sudo pacman -S make
     sudo pacman -S screenfetch
@@ -54,4 +57,4 @@
     sudo pacman -S deepin.com.qq.office
     sudo pacman -S clang gdb
     sudo pacman -S flameshot-git
-    sudo pacman -S wps-office
+    sudo pacman -S wps-office ttf-wps-fonts
