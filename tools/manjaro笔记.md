@@ -32,7 +32,7 @@
     sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     chsh -s /bin/zsha
     
-    sudo pacman -S fcitx-googlepinyin
+    sudo pacman -S kcm-fcitx fcitx-googlepinyin
     
     安装搜狗输入法
     sudo pacman -S fcitx-lilydjwg-git fcitx-configtool fcitx-sogoupinyin
