@@ -83,3 +83,5 @@
     yay -S deepin.com.qq.office
     yay -S deepin-wine-wechat
     
+    https://github.com/countstarlight/deepin-wine-wechat-arch/releases
+    
