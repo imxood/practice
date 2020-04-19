@@ -75,12 +75,11 @@
     # jdk8
     sudo pacman -S jdk8-openjdk
     
-    # 安装stm32cubemx
-    yay -S stm32cubemx
-    
+    sudo pacman -S yay
+        
     AUR库:
-    deepin-wine-wechat
-    deepin.com.qq.office
-    
-    
+    yay -Syy
+    yay -S stm32cubemx
+    yay -S deepin.com.qq.office
+    yay -S deepin-wine-wechat
     
