@@ -1,6 +1,23 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceRoot}",
+            "executable": "/tmp/arduino_build_91378/fm25v10.ino.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "gdbTarget": "127.0.0.1:3333",
+            "preLaunchCommands": [
+                "monitor halt",
+                "set $pc=reset_isr",
+                "i r",
+                "b reset_isr",
+                "b main",
+                "c"
+            ]
+        },
 		{
 			"name": "Python: Special Module",
 			"type": "python",
