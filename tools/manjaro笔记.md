@@ -67,7 +67,9 @@
     # docker
     sudo pacman -S docker docker-compose
     
-    docker镜像加速器: https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
+    docker镜像加速器:
+        https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
+        https://www.daocloud.io/mirror
     
     # stm32开发环境
     sudo pacman -S arm-none-eabi-gcc arm-none-eabi-gdb arm-none-eabi-newlib
