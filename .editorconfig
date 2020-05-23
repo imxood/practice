@@ -7,10 +7,13 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.{c,cpp,h,hpp,md,yaml,html,css,js,jsx}]
+[*.{c,cpp,h,hpp,md,yaml,html,css,js,json,jsx}]
 indent_style = tab
 
 [{CMakeLists.txt,*.cmake,Makefile}]
+indent_style = tab
+
+[*.yml]
 indent_style = tab
 
 [*.vue]
