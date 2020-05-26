@@ -2,6 +2,8 @@
 
 ## 常用命令
 
+    openocd -f interface/cmsis-dap.cfg -f target/stm32h7x.cf, 使用cmsis-dap调试stm32h750
+
     openocd -f board/stm32f7discovery.cfg
 
     telnet localhost 4444
@@ -32,7 +34,7 @@
     LDFLAGS += -Wl,-Map=output.map
 
     openocd -f board/stm32f7discovery.cfg -c "program output.bin ${flash_to_addr} reset; halt; reg pc ${reset_entry}; resume; exit"
-    
+
 # openocd 用法
 
 如果你的设备支持openocd调试, 那么调试器连接上PC, 在PC上运行openocd, 就作为一个Server, 可调式, 可烧写
