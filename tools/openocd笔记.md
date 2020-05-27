@@ -1,5 +1,13 @@
 # openocd笔记
 
+## 在linux中当前用户执行openocd， 报错: unable to open CMSIS-DAP device 0xc251:0xf001
+
+    sudo vim /etc/udev/rules.d/cmsis-dap.rules, 添加一下内容(记得更改组):
+        ATTRS{idVendor}=="c251", ATTRS{idProduct}=="f001", MODE="664", GROUP="maxu"
+
+    sudo udevadm control --reload
+
+
 ## 常用命令
 
     openocd -f interface/cmsis-dap.cfg -f target/stm32h7x.cf, 使用cmsis-dap调试stm32h750
