@@ -1,6 +1,16 @@
 # openocd笔记
 
+## 在linux中当前用户执行openocd， 报错: unable to open CMSIS-DAP device 0xc251:0xf001
+
+    sudo vim /etc/udev/rules.d/cmsis-dap.rules, 添加一下内容(记得更改组):
+        ATTRS{idVendor}=="c251", ATTRS{idProduct}=="f001", MODE="664", GROUP="maxu"
+
+    sudo udevadm control --reload
+
+
 ## 常用命令
+
+    openocd -f interface/cmsis-dap.cfg -f target/stm32h7x.cf, 使用cmsis-dap调试stm32h750
 
     openocd -f board/stm32f7discovery.cfg
 
@@ -32,7 +42,7 @@
     LDFLAGS += -Wl,-Map=output.map
 
     openocd -f board/stm32f7discovery.cfg -c "program output.bin ${flash_to_addr} reset; halt; reg pc ${reset_entry}; resume; exit"
-    
+
 # openocd 用法
 
 如果你的设备支持openocd调试, 那么调试器连接上PC, 在PC上运行openocd, 就作为一个Server, 可调式, 可烧写

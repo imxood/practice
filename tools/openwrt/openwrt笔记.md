@@ -1,6 +1,6 @@
 # 试玩笔记
 
-# openwrt 源码编译
+## openwrt 源码编译
 
     参考: https://openwrt.org/docs/guide-developer/quickstart-build-images
 
@@ -61,6 +61,14 @@
 
     make -j12 V=s
 
+    # 生成文件位于: bin/targets/ramips/mt7621
+
+## 烧写
+
+    http://192.168.1.1/
+
+    固件更新 ->
+
 ## 连接wifi
 
     网络 --> 无线 --> 扫描 --> 选择热点, 加入网络 --> 密码, 5G通道就选择 US 149 --> ok
@@ -76,4 +84,8 @@ vim /etc/config/network
 /etc/init.d/network restart
 
 ## 设置二级路由桥接
+
+
+
+
 
