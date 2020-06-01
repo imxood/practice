@@ -1,14 +1,14 @@
 # Linux笔记
 
 ## issue
-    
+
     maxu@maxu-pc:/media/maxu$ sudo mount -t ntfs-3g /dev/sdb4 /mnt/A/
     The disk contains an unclean file system (0, 0).
     Metadata kept in Windows cache, refused to mount.
     Falling back to read-only mount because the NTFS partition is in an
     unsafe state. Please resume and shutdown Windows fully (no hibernation
     or fast restarting.)
-    
+
     修复: sudo ntfsfix /dev/sdb4
 
 
@@ -852,19 +852,6 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
     ＃　安装boot-repair并启动软件
     sudo apt install -y boot-repair && boot-repair
 
-## pip 升级问题
-
-    Traceback (most recent call last):
-    File "/usr/bin/pip3", line 9, in <module>
-        from pip import main
-    ImportError: cannot import name 'main'
-
-    curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
-
-## pip setuptools 版本太低
-
-    pkg_resources.VersionConflict: (setuptools 20.7.0 (/usr/lib/python3/dist-packages), Requirement.parse('setuptools>=40.0'))
-    pip3 install -U --user setuptools
 
 ## 更改硬件时间
 

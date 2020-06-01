@@ -1,5 +1,11 @@
 # docker的基本使用及技巧
 
+
+## docker 图形化
+
+    docker pull portainer/portainer
+
+
 ## linux安装docker
 
 curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun

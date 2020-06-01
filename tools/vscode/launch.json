@@ -17,7 +17,17 @@
                 "b main",
                 "c"
             ]
-        },
+		},
+		{
+			"name": "Python: Module",
+			"type": "python",
+			"cwd": "/home/mx/develop/sources/invoke",
+			"request": "launch",
+			"module": "invoke.__main__",
+			"args": [
+				"upload"
+			]
+		},
 		{
 			"name": "Python: Special Module",
 			"type": "python",

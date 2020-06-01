@@ -112,3 +112,33 @@ isinstance(obj, class_name), 判断是否是指定类型的变量
     platform.processor(), 'x86_64', 计算机处理器信息
 
     platform.uname(), 包含上面所有的信息汇总
+
+
+
+## 报错
+
+    Run: python3 get-pip.py --user
+
+    Error: Could not fetch URL https://pypi.tuna.tsinghua.edu.cn/simple/pip/: There was a problem confirming the ssl certificate
+
+    Solved:
+
+        sudo apt-get install apt-transport-https ca-certificates software-properties-common
+
+        或
+
+        python3 get-pip.py --user --trusted-host pypi.tuna.tsinghua.edu.cn
+
+## pip 升级问题
+
+    Traceback (most recent call last):
+    File "/usr/bin/pip3", line 9, in <module>
+        from pip import main
+    ImportError: cannot import name 'main'
+
+    curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
+
+## pip setuptools 版本太低
+
+    pkg_resources.VersionConflict: (setuptools 20.7.0 (/usr/lib/python3/dist-packages), Requirement.parse('setuptools>=40.0'))
+    pip3 install -U --user setuptools

@@ -26,6 +26,7 @@ class SerialProtocol(Protocol):
     def data_received(self, data):
 
         d = data.decode(self.ENCODING, self.UNICODE_HANDLING)
+        print('"{} {}"'.format(len(d), d))
 
         index = d.find('\n')
         if index != -1:
