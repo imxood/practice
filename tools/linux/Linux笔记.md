@@ -852,7 +852,28 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
     ＃　安装boot-repair并启动软件
     sudo apt install -y boot-repair && boot-repair
 
+## pip 升级问题
+
+    Traceback (most recent call last):
+    File "/usr/bin/pip3", line 9, in <module>
+        from pip import main
+    ImportError: cannot import name 'main'
+
+    curl https://bootstrap.pypa.io/get-pip.py | python3 - --user
+
+## pip setuptools 版本太低
+
+    pkg_resources.VersionConflict: (setuptools 20.7.0 (/usr/lib/python3/dist-packages), Requirement.parse('setuptools>=40.0'))
+    pip3 install -U --user setuptools
 
 ## 更改硬件时间
 
     timedatectl set-local-rtc 1 --adjust-system-clock
+
+## manjora 笔记本合盖不关屏幕
+
+    sudo vim /etc/UPower/UPower.conf
+
+    修改 IgnoreLid=false 为 IgnoreLid=true
+
+    sudo systemctl restart upower.service

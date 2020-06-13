@@ -3,12 +3,13 @@
 ## 第一次提交代码
 
     git init
-    git add .
 
-    git remote add origin git@github.com:imxood/MXSpice.git
-    git pull origin master --allow-unrelated-histories
+    git remote add origin git@gitee.com:imxood/stm32h750_rt_app.git
+    git pull origin master
+
     git branch --set-upstream-to=origin/master
 
+    git add .
     git commit -m "."
     git push
 

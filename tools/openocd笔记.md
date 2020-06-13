@@ -10,7 +10,7 @@
 
 ## 常用命令
 
-    openocd -f interface/cmsis-dap.cfg -f target/stm32h7x.cf, 使用cmsis-dap调试stm32h750
+    openocd -f interface/cmsis-dap.cfg -f target/stm32h7x.cfg, 使用cmsis-dap调试stm32h750
 
     openocd -f board/stm32f7discovery.cfg
 

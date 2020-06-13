@@ -17,7 +17,7 @@
                 "b main",
                 "c"
             ]
-		},
+        },
 		{
 			"name": "Python: Module",
 			"type": "python",
