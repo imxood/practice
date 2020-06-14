@@ -30,6 +30,8 @@
 
     reg, 查看寄存器内容, 在halt状态下才会显示内容
 
+    targets, 显示所有目标
+
 ## 使用gdb和openocd实现远程下载
 
     arm-none-eabi-gdb -q --readnow -ex "target remote 127.0.0.1:3333" -ex "b main" -ex "monitor halt" -ex "load" -ex "c" -ex "monitor resume" -ex "echo ok\n" -ex "disconnect" -ex "q"
@@ -125,3 +127,25 @@
 
     关于"ose.cpu mdw", 这样内存读写命令, 可以通过"help mem"的形式搜索, 有很多类似的命令, 都可以实现查看内存
 
+
+
+## 自定义proc
+
+    stmh7_cmsis.cfg:
+
+        source [find interface/cmsis-dap.cfg]
+
+        transport select swd
+
+        source [find target/stm32h7x.cfg]
+
+        proc flash () {
+            init
+            halt
+            flash write_image erase rtthread.bin 0x08000000
+            reset run
+            shutdown
+        }
+
+    使用:
+        openocd -f stmh7_cmsis.cfg -c "flash ()"
