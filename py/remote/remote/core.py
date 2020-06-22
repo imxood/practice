@@ -254,9 +254,6 @@ class BufferedWriter:
             written = self.protocol.stream.write(buf)
             self._len -= written
 
-    def on_receive(self, buf):
-        pass
-
 
 class BootstrapProtocol(Protocol):
 
@@ -264,8 +261,21 @@ class BootstrapProtocol(Protocol):
         self.broker = broker
         self._writer = BufferedWriter(broker, self)
 
+    def on_receive(self, buf):
+        print(buf)
+        pass
+
     def on_transmit(self, broker):
         self._writer.on_transmit()
+
+    def _send(self, data):
+        self._writer.write(data)
+
+    def on_shutdown(self):
+        return
+
+    def on_disconnect(self):
+        return
 
 
 class Poller:
@@ -334,7 +344,8 @@ class Broker():
             func()
 
     def start_receive(self, stream: Stream):
-        self.defer(self._poller.start_receive, self._waker.rfd, (stream.on_receive, stream))
+        self.defer(self._poller.start_receive, stream.rfd,
+                   (stream.on_receive, stream))
 
     def stop_receive(self, stream: Stream):
         pass
@@ -343,7 +354,7 @@ class Broker():
         pass
 
 
-class PopenProcess:
+class Process:
 
     def __init__(self, proc: Popen, stdin: int, stdout: int, stderr: int):
         self.proc = proc
@@ -448,30 +459,8 @@ class Connection():
         self._router = router
 
     def _first_stage():
-        R, W = os.pipe()
-        r, w = os.pipe()
-        if os.fork():
-            os.dup2(0, 100)
-            os.dup2(R, 0)
-            os.dup2(r, 101)
-            os.close(R)
-            os.close(r)
-            os.close(W)
-            os.close(w)
-            if sys.platform == 'darwin' and sys.executable == '/usr/bin/python':
-                sys.executable += sys.version[:3]
-            os.environ['ARGV0'] = sys.executable
-            os.execl(sys.executable, sys.executable + '(mitogen:CONTEXT_NAME)')
-        os.write(1, 'MITO000\n'.encode())
-        C = _(os.fdopen(0, 'rb').read(1024), 'zip')
-        fp = os.fdopen(W, 'wb', 0)
-        fp.write(C)
-        fp.close()
-        fp = os.fdopen(w, 'wb', 0)
-        fp.write(C)
-        fp.close()
-        os.write(1, 'MITO001\n'.encode())
-        os.close(2)
+        data = os.read(0, 1024)
+        print(data)
 
     def _complete_connect(self):
         return
@@ -481,15 +470,12 @@ class Connection():
         source = textwrap.dedent('\n'.join(source.strip().split('\n')[2:]))
         source = source.replace('    ', '\t')
         source = source.replace('CONTEXT_NAME', self.get_default_remote_name())
-        # preamble_compressed = self.get_preamble()
-        # source = source.replace('PREAMBLE_COMPRESSED_LEN',
-        #                         str(len(preamble_compressed)))
-        # compressed = zlib.compress(source.encode(), 9)
         encoded = base64.b64encode(source.encode())
         return ['/usr/bin/python'] + [
             '-c',
-            'import base64,os,sys;exec(base64.b64decode("%s").decode())' % encoded
+            'import os;data = os.read(0, 1024);print(data)'
         ]
+        # 'import base64,os,sys;exec(base64.b64decode("%s").decode())' % encoded
 
     def get_default_remote_name(self):
         s = u'%s@%s:%d'
@@ -503,9 +489,9 @@ class Connection():
     def _get_name(self):
         return u'%s.%s' % (self.name_prefix, self.proc.proc.pid)
 
-    def _config_stdio_stream(self):
+    def _config_stdio_stream(self) -> Stream:
         stream = self.stream_protocol_class.build_stream(self._router.broker)
-        stream.accept(self.proc.stdin, self.proc.stdout)
+        stream.accept(self.proc.stdout, self.proc.stdin)
         stream.name = self._get_name()
         self._router.broker.start_receive(stream)
         return stream
@@ -513,7 +499,6 @@ class Connection():
     def start_child(self, args):
         parent_rfd, child_wfd = os.pipe()
         child_rfd, parent_wfd = os.pipe()
-        stderr_r, stderr = os.pipe()
         try:
             proc = Popen(
                 args=args,
@@ -531,7 +516,12 @@ class Connection():
         os.close(child_rfd)
         os.close(child_wfd)
 
-        return PopenProcess(proc, parent_wfd, parent_rfd, None)
+        return Process(
+            proc=proc,
+            stdin=parent_wfd,
+            stdout=parent_rfd,
+            stderr=None
+        )
 
     def _async_connect(self):
         args = self.get_boot_command()
@@ -540,6 +530,7 @@ class Connection():
         if self.context.name is None:
             self.context.name = self.stdio_stream.name
         self.proc.name = self.context.name
+        self._router.broker.defer(self.stdio_stream.protocol._send, b'hello')
 
     def connect(self, context: Context):
         self.context = context
