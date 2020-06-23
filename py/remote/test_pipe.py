@@ -15,21 +15,20 @@ source = textwrap.dedent(source)
 source = source.replace('    ', '\t')
 
 
-print(source)
-
 proc = subprocess.Popen(
-    args=['python', '-c', 'exec("%s\n")\nhello()' % source],
-    # args=['python', '-c', 'import os\ndata = os.read(0, 1024)\nprint(data)'],
-    # stdin=child_rfd,
+    # args=['python', '-c', 'print("%s")' % source],
+    args=['python'],
+    stdin=child_rfd,
     # stdout=child_wfd,
     shell=True
 )
 
 # time.sleep(0.5)
-# os.write(parent_wfd, b'hello')
+os.write(parent_wfd, b'import os;\ndata = os.read(0, 1024);\nprint(data)')
+os.write(parent_wfd, b'hello')
 
-stdout, stderr = proc.communicate()
-proc.wait()
+# stdout, stderr = proc.communicate()
+# proc.wait()
 
-print(stdout)
-print(stderr)
+# print(stdout)
+# print(stderr)
