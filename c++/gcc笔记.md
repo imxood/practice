@@ -8,7 +8,10 @@
 ## attribute用法集锦
 
     __attribute__((weak)), 设置弱函数
-    
+
 ## 编译选项
 
-    
+
+## "arm-none-eabi-gdb --version"报错: libncurses.so.5: cannot open shared object file
+
+    sudo apt install libncurses5

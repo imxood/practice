@@ -21,6 +21,8 @@ w
 
 
 
+sudo losetup --list， 寻找可用的loop设备
+
 # 把磁盘文件关联到/dev/loop7设备上
 sudo losetup -o 1048576 /dev/loop7 disk.img
 
