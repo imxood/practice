@@ -2,10 +2,15 @@
 *.bin
 *.lst
 *.out
+*.so
+*.a
 *.exe
 *.i
+*.d
 *.map
 out.s
+
+build
 
 *.pyc
 __pycache__

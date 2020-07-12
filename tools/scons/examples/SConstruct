@@ -1,3 +1,15 @@
 
-env = Environment(CC='gcc')
-env.Program('hello.c')
+env = Environment(
+    CC='gcc',
+    LIBPATH=['#../build/libs'],
+    CPPPATH = ['#libs']
+)
+
+print('CCCOM: ', env['CCCOM'])
+
+env.VariantDir('#build/src/test', '#../test', duplicate=0)
+
+Export('env')
+
+SConscript('libs/SConscript', variant_dir='#../build/libs', duplicate=0)
+SConscript('src/SConscript', variant_dir='build/src', duplicate=0)

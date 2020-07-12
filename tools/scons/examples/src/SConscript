@@ -1,0 +1,9 @@
+Import('env')
+
+env.Program(
+    'hello.exe',
+    ['hello.c', '/develop/sources/practice/tools/scons/test/test.c'],
+    LIBS=['foo'],
+    CCFLAGS='-MD -MF hello.d',
+    parse_flags='-Iinclude -DEBUG -lm'
+)
