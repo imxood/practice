@@ -16,7 +16,9 @@ build
 __pycache__
 
 
-.vscode
+**/.vscode/*
+!**/.vscode/launch.json
+
 .venv
 Pipfile.lock
 .backup

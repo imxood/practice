@@ -1,8 +1,5 @@
 Import('env')
 
-
-env.VariantDir('#build/libs', '#libs', duplicate = 0)
-
 env.Library('foo', ['foo.c'])
 env.StaticLibrary('sfoo', ['foo.c'])
 env.SharedLibrary('dfoo', ['foo.c'])

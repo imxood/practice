@@ -1,15 +1,26 @@
 
 env = Environment(
     CC='gcc',
-    LIBPATH=['#../build/libs'],
-    CPPPATH = ['#libs']
+    LIBPATH=['#build/libs/bar', '#build/libs/foo'],
+    CPPPATH = ['#build/libs/foo']
 )
-
-print('CCCOM: ', env['CCCOM'])
-
-env.VariantDir('#build/src/test', '#../test', duplicate=0)
 
 Export('env')
 
-SConscript('libs/SConscript', variant_dir='#../build/libs', duplicate=0)
-SConscript('src/SConscript', variant_dir='build/src', duplicate=0)
+
+# VariantDir('build/libs/bar', 'libs/bar')
+# SConscript('libs/bar/SConscript')
+
+
+SConscript('libs/foo/SConscript', variant_dir='build/libs/foo', duplicate=0)
+# SConscript('src/SConscript', variant_dir='build/src', duplicate=0)
+
+
+
+
+# SConscript('libs/bar/SConscript', variant_dir='build/libs/bar')
+
+
+env.VariantDir('build/libs/bar', '#')
+env.Library('build/libs/bar/bar', 'build/libs/bar/bar.c')
+Repository('#../bar')
