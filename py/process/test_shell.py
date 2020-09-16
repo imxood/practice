@@ -1,4 +1,3 @@
-
 import os
 import sys
 import io
@@ -19,14 +18,11 @@ from pathlib import Path
 
 import tempfile
 import tarfile
-from common import vlog
-
-# paramiko.common.logging.basicConfig(level=paramiko.common.DEBUG)
+from test_common import vlog
 
 log = vlog
 
 
-# remote tool with paramiko
 class ExceptionHandleThread(threading.Thread):
 
     def __init__(self, **kwargs):
@@ -48,7 +44,7 @@ class ExceptionHandleThread(threading.Thread):
 
 class Runner:
 
-    read_chunk_size = 1000
+    read_chunk_size = 4096
 
     def __init__(self):
         self.command_cwds = list()
@@ -74,24 +70,29 @@ class Runner:
     def cwd(self):
         raise NotImplementedError
 
-    def _handle_output(self, buffer_, hide, log, reader):
+    def handle_output(self, buffer_, hide, log, reader, fileio: io.FileIO):
 
         while True:
             data = reader(self.read_chunk_size)
             if not data:
                 break
+            if fileio:
+                fileio.write(data)
+                fileio.flush()
             data = data.decode('utf-8', "replace")
-            if not hide:
-                log.info(data.rstrip())
-            buffer_.append(data)
+            buffered_string = io.StringIO(data)
+            for line in buffered_string.readlines():
+                if not hide:
+                    log.info(line.rstrip())
+                buffer_.append(line)
 
-    def handle_stdout(self, buffer_, hide, log):
-        self._handle_output(buffer_, hide, log, reader=self.read_proc_stdout)
+    def handle_stdout(self, buffer_, hide, log, fileio: io.FileIO = None):
+        self.handle_output(buffer_, hide, log, reader=self.read_proc_stdout, fileio=fileio)
 
-    def handle_stderr(self, buffer_, hide, log):
-        self._handle_output(buffer_, hide, log, reader=self.read_proc_stderr)
+    def handle_stderr(self, buffer_, hide, log, fileio: io.FileIO = None):
+        self.handle_output(buffer_, hide, log, reader=self.read_proc_stderr, fileio=fileio)
 
-    def _run(self, hide):
+    def _run(self, hide, log: logging.Logger, fileio: io.FileIO):
 
         thread_args = dict()
 
@@ -101,13 +102,15 @@ class Runner:
         thread_args[self.handle_stdout] = {
             'buffer_': output,
             'hide': hide,
-            'log': vlog
+            'log': vlog,
+            'fileio': fileio
         }
 
         thread_args[self.handle_stderr] = {
             'buffer_': error,
             'hide': hide,
-            'log': vlog
+            'log': vlog,
+            'fileio': fileio
         }
 
         for target, kwargs in thread_args.items():
@@ -143,7 +146,7 @@ class Local(Runner):
         self.process = None
         super(Local, self).__init__(*args, **kwargs)
 
-    def run(self, cmd, hide, env=None):
+    def run(self, cmd, hide, env=None, log=logging.getLogger(), fileio: io.FileIO = None):
 
         command = self._prefix_commands(cmd)
 
@@ -154,7 +157,7 @@ class Local(Runner):
             stdout=PIPE,
             stderr=STDOUT
         )
-        return self._run(hide)
+        return self._run(hide, log=log, fileio=fileio)
 
     def read_proc_stdout(self, num_bytes):
         return os.read(self.process.stdout.fileno(), num_bytes)
@@ -228,7 +231,7 @@ class Remote(Runner):
             self.transport = None
             print('Remote closed')
 
-    def run(self, cmd, hide=False, shell=None, env={}):
+    def run(self, cmd, hide=False, shell=None, env={}, log=logging.getLogger(), fileio: io.FileIO = None):
         self.open()
         command = self._prefix_commands(cmd)
         self.channel = self.transport.open_session()
@@ -236,7 +239,7 @@ class Remote(Runner):
         self.update_environment(env, shell)
 
         self.channel.exec_command(command)
-        ret = self._run(hide)
+        ret = self._run(hide, log=log, fileio=fileio)
         self.channel.close()
         return ret
 
@@ -430,12 +433,12 @@ class Shell():
                 break
         return ret
 
-    def remote(self, cmd, env={}, hide=False, error_count=1):
+    def remote(self, cmd, env={}, hide=False, error_count=1, log=logging.getLogger(), fileio: io.FileIO = None):
         """ run remote command """
         ret = None
         while error_count:
             error_count -= 1
-            ret = self.remote_runner.run(cmd, hide, env=env)
+            ret = self.remote_runner.run(cmd, hide, env=env, log=log, fileio=fileio)
             if ret[0] == 0:
                 break
             log.warning('run [{}] failed, out: {}, err: {}'.format(cmd, ret[1], ret[2]))

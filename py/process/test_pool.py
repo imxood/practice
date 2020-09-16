@@ -1,5 +1,7 @@
 import os
 import sys
+import io
+import tempfile
 import time
 import random
 import argparse
@@ -11,7 +13,7 @@ from os.path import abspath, dirname
 
 import signal
 from pynput import keyboard
-from common import vlog
+from test_common import vlog
 from test_shell import Shell
 
 
@@ -205,14 +207,14 @@ def task2(queue: Queue):
 
 def task3():
     vlog.info("enter task3")
-    time.sleep(5)
+    time.sleep(10)
     vlog.info("leave task3")
     return 1
 
 
 def task4():
     vlog.info("enter task4")
-    time.sleep(10)
+    time.sleep(5)
     vlog.info("leave task4")
     return 0
 
@@ -230,12 +232,12 @@ def serial_task():
     }
 
     with Shell(dev_info) as s:
-        # s.remote('python3 -m serial.tools.miniterm /dev/ttyUSB0 115200')
-        ret = s.remote('plink -serial /dev/ttyUSB0 -sercfg 115200,8,n,1,N')
-        if ret[0]:
-            print(ret)
-        return ret
-
+        with io.FileIO(tempfile.gettempdir() + '/test.log', 'w') as fileio:
+            # ret = s.remote('plink -serial /dev/ttyUSB0 -sercfg 115200,8,n,1,N', log=vlog, fileio=fileio)
+            ret = s.remote('miniterm /dev/ttyUSB0 115200 --raw -q', log=vlog, fileio=fileio)
+            if ret[0]:
+                print(ret)
+            return ret
     return 0
 
 
@@ -271,15 +273,15 @@ def test1():
 
 
 def test2():
+    log = logging.getLogger('')
     vlog.info('main pid: %d' % os.getpid())
-    vlog.info(sys.stdin)
     queue = Queue()
     manager = TaskManager()
     # task_1 = Task(task1, 80, queue)
     # task_2 = Task(task2, 80, queue)
     # manager.add_task(task_1)
     # manager.add_task(task_2)
-    manager.add_task(Task(task3, 30))
+    # manager.add_task(Task(task3, 30))
     manager.add_task(Task(task4, 30))
     manager.add_task(Task(serial_task, 30))
     manager.start()
