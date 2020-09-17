@@ -5,11 +5,13 @@ import time
 import logging
 import threading
 import stat
-from subprocess import Popen, PIPE, STDOUT
 import signal
 import json
 import pickle
+from subprocess import Popen, PIPE, STDOUT
+from pprint import pprint
 from contextlib import contextmanager
+import queue
 
 import paramiko
 from paramiko import SSHClient, AutoAddPolicy
@@ -18,9 +20,9 @@ from pathlib import Path
 
 import tempfile
 import tarfile
-from test_common import vlog
+from test_common import tlog
 
-log = vlog
+log = tlog
 
 
 class ExceptionHandleThread(threading.Thread):
@@ -44,7 +46,7 @@ class ExceptionHandleThread(threading.Thread):
 
 class Runner:
 
-    read_chunk_size = 4096
+    read_chunk_size = 1000
 
     def __init__(self):
         self.command_cwds = list()
@@ -70,29 +72,26 @@ class Runner:
     def cwd(self):
         raise NotImplementedError
 
-    def handle_output(self, buffer_, hide, log, reader, fileio: io.FileIO):
+    def handle_output(self, buffer_, hide, reader, log, msgQ: queue.Queue = None):
 
         while True:
             data = reader(self.read_chunk_size)
             if not data:
                 break
-            if fileio:
-                fileio.write(data)
-                fileio.flush()
             data = data.decode('utf-8', "replace")
-            buffered_string = io.StringIO(data)
-            for line in buffered_string.readlines():
-                if not hide:
-                    log.info(line.rstrip())
-                buffer_.append(line)
+            if not hide:
+                log.info(data)
+            if msgQ:
+                msgQ.put(data)
+            buffer_.append(data)
 
-    def handle_stdout(self, buffer_, hide, log, fileio: io.FileIO = None):
-        self.handle_output(buffer_, hide, log, reader=self.read_proc_stdout, fileio=fileio)
+    def handle_stdout(self, buffer_, hide, log, msgQ: queue.Queue = None):
+        self.handle_output(buffer_, hide, reader=self.read_proc_stdout, log=log, msgQ=msgQ)
 
-    def handle_stderr(self, buffer_, hide, log, fileio: io.FileIO = None):
-        self.handle_output(buffer_, hide, log, reader=self.read_proc_stderr, fileio=fileio)
+    def handle_stderr(self, buffer_, hide, log, msgQ: queue.Queue = None):
+        self.handle_output(buffer_, hide, reader=self.read_proc_stderr, log=log, msgQ=msgQ)
 
-    def _run(self, hide, log: logging.Logger, fileio: io.FileIO):
+    def _run(self, hide, log: logging.Logger, msgQ: queue.Queue = None):
 
         thread_args = dict()
 
@@ -102,15 +101,15 @@ class Runner:
         thread_args[self.handle_stdout] = {
             'buffer_': output,
             'hide': hide,
-            'log': vlog,
-            'fileio': fileio
+            'log': log,
+            'msgQ': msgQ
         }
 
         thread_args[self.handle_stderr] = {
             'buffer_': error,
             'hide': hide,
-            'log': vlog,
-            'fileio': fileio
+            'log': log,
+            'msgQ': msgQ
         }
 
         for target, kwargs in thread_args.items():
@@ -146,7 +145,7 @@ class Local(Runner):
         self.process = None
         super(Local, self).__init__(*args, **kwargs)
 
-    def run(self, cmd, hide, env=None, log=logging.getLogger(), fileio: io.FileIO = None):
+    def run(self, cmd, hide, env=None, log=logging.getLogger(), msgQ: queue.Queue = None):
 
         command = self._prefix_commands(cmd)
 
@@ -157,7 +156,7 @@ class Local(Runner):
             stdout=PIPE,
             stderr=STDOUT
         )
-        return self._run(hide, log=log, fileio=fileio)
+        return self._run(hide, log=log, msgQ=msgQ)
 
     def read_proc_stdout(self, num_bytes):
         return os.read(self.process.stdout.fileno(), num_bytes)
@@ -231,7 +230,7 @@ class Remote(Runner):
             self.transport = None
             print('Remote closed')
 
-    def run(self, cmd, hide=False, shell=None, env={}, log=logging.getLogger(), fileio: io.FileIO = None):
+    def run(self, cmd, hide=False, shell=None, env={}, log=logging.getLogger(), msgQ: queue.Queue = None):
         self.open()
         command = self._prefix_commands(cmd)
         self.channel = self.transport.open_session()
@@ -239,7 +238,7 @@ class Remote(Runner):
         self.update_environment(env, shell)
 
         self.channel.exec_command(command)
-        ret = self._run(hide, log=log, fileio=fileio)
+        ret = self._run(hide, log=log, msgQ=msgQ)
         self.channel.close()
         return ret
 
@@ -433,12 +432,12 @@ class Shell():
                 break
         return ret
 
-    def remote(self, cmd, env={}, hide=False, error_count=1, log=logging.getLogger(), fileio: io.FileIO = None):
+    def remote(self, cmd, env={}, hide=False, error_count=1, log=logging.getLogger(), msgQ: queue.Queue = None):
         """ run remote command """
         ret = None
         while error_count:
             error_count -= 1
-            ret = self.remote_runner.run(cmd, hide, env=env, log=log, fileio=fileio)
+            ret = self.remote_runner.run(cmd, hide, env=env, log=log, msgQ=msgQ)
             if ret[0] == 0:
                 break
             log.warning('run [{}] failed, out: {}, err: {}'.format(cmd, ret[1], ret[2]))

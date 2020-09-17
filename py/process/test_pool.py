@@ -6,6 +6,7 @@ import time
 import random
 import argparse
 import logging
+import queue
 from multiprocessing import Queue, Process, Manager, Pool, Lock, set_start_method
 from threading import Thread
 from enum import Enum
@@ -13,7 +14,7 @@ from os.path import abspath, dirname
 
 import signal
 from pynput import keyboard
-from test_common import vlog
+from test_common import tlog, get_logger
 from test_shell import Shell
 
 
@@ -45,7 +46,7 @@ def task(args):
 
     time_end = time.time()
 
-    vlog.info('[%d]time_diff: %f' % (os.getpid(), time_end - time_start))
+    tlog.info('[%d]time_diff: %f' % (os.getpid(), time_end - time_start))
 
 
 class TaskStatus(Enum):
@@ -187,58 +188,83 @@ manager = None
 
 
 def task1(queue: Queue):
-    vlog.info("enter task1")
+    tlog.info("enter task1")
     time.sleep(4)
     msg = 'please exit'
-    vlog.info('put msg: %s' % msg)
+    tlog.info('put msg: %s' % msg)
     queue.put(msg)
-    vlog.info("leave task1")
+    tlog.info("leave task1")
     return 0
 
 
 def task2(queue: Queue):
-    vlog.info("enter task2")
-    vlog.info('wait for queue msg ...')
+    tlog.info("enter task2")
+    tlog.info('wait for queue msg ...')
     msg = queue.get()
-    vlog.info('get msg: %s' % msg)
-    vlog.info("leave task2")
+    tlog.info('get msg: %s' % msg)
+    tlog.info("leave task2")
     return 0
 
 
 def task3():
-    vlog.info("enter task3")
+    tlog.info("enter task3")
     time.sleep(10)
-    vlog.info("leave task3")
+    tlog.info("leave task3")
     return 1
 
 
 def task4():
-    vlog.info("enter task4")
+    tlog.info("enter task4")
     time.sleep(5)
-    vlog.info("leave task4")
+    tlog.info("leave task4")
     return 0
 
 
-def serial_task():
+def task5():
+    for i in range(5):
+        tlog.info("leave task4")
+        time.sleep(0.1)
+    return 0
 
-    vlog.info('serial_task pid: %d' % os.getpid())
 
-    vlog.info("enter serial_task")
+def serial_line_handler(msgQ: queue.Queue, timeout: float):
+    lines = []
+    timeout_old = timeout
+    STOP_TIME = 3
+    while True:
+        try:
+            line = msgQ.get(timeout=timeout)
+            timeout = timeout_old
+            lines.append(line)
+            if timeout == STOP_TIME:
+                break
+            if line.startswith('FATAL_ERROR'):
+                timeout = STOP_TIME
+                continue
+            if line.startswith('SUCCESS'):
+                timeout = STOP_TIME
+        except queue.Empty:
+            break
 
-    dev_info = {
-        'hostname': '127.0.0.1',
-        'username': 'maxu',
-        'port': 22
-    }
 
-    with Shell(dev_info) as s:
-        with io.FileIO(tempfile.gettempdir() + '/test.log', 'w') as fileio:
-            # ret = s.remote('plink -serial /dev/ttyUSB0 -sercfg 115200,8,n,1,N', log=vlog, fileio=fileio)
-            ret = s.remote('miniterm /dev/ttyUSB0 115200 --raw -q', log=vlog, fileio=fileio)
+def serial_task(env_name, project='', casename=''):
+
+    dev_inf = get_dev_inf(env_name, 'serial')
+
+    with Shell(dev_inf, vlog) as s:
+
+        vlog.info('serial ...')
+
+        with s.cd_remote(REMOTE_WORKSPACE):
+
+            slog = get_logger('serial', serial_line_handler)
+            command = 'plink -serial /dev/ttyUSB0 -sercfg 115200,8,n,1,N'
+
+            ret = s.remote(command, log=slog)
             if ret[0]:
-                print(ret)
-            return ret
-    return 0
+                vlog.error('run [{}] failed'.format(command))
+                return ret[0]
+            return 0
 
 
 def log_task():
@@ -262,19 +288,19 @@ def test1():
             p.map(task, tasks_args)
 
         # for data in datas:
-        #     vlog.info(data['a'])
+        #     tlog.info(data['a'])
         time_end = time.time()
 
-        vlog.info('[%d]time_start: %f' % (os.getpid(), time_start))
-        vlog.info('[%d]time_end: %f' % (os.getpid(), time_end))
-        vlog.info('[%d]time_diff: %f' % (os.getpid(), time_end - time_start))
+        tlog.info('[%d]time_start: %f' % (os.getpid(), time_start))
+        tlog.info('[%d]time_end: %f' % (os.getpid(), time_end))
+        tlog.info('[%d]time_diff: %f' % (os.getpid(), time_end - time_start))
 
-        vlog.info('len: %d' % len(share_datas))
+        tlog.info('len: %d' % len(share_datas))
 
 
 def test2():
     log = logging.getLogger('')
-    vlog.info('main pid: %d' % os.getpid())
+    tlog.info('main pid: %d' % os.getpid())
     queue = Queue()
     manager = TaskManager()
     # task_1 = Task(task1, 80, queue)
@@ -295,11 +321,11 @@ def test2():
 
 
 # def on_press(key):
-#     vlog.info(key)
+#     tlog.info(key)
 #     if key in COMBINATION:
 #         current.add(key)
 #         if all(k in current for k in COMBINATION):
-#             vlog.info('All modifiers active!')
+#             tlog.info('All modifiers active!')
 #     if key == keyboard.Key.esc:
 #         listener.stop()
 
@@ -313,25 +339,25 @@ def test2():
 
 # test 2
 def on_activate_ctrl_c():
-    vlog.info('<ctrl>+c pressed')
+    tlog.info('<ctrl>+c pressed')
 
 
 def on_activate_ctrl_shift_a():
-    vlog.info('<ctrl>+<shift>+a pressed')
+    tlog.info('<ctrl>+<shift>+a pressed')
 
 
 def signal_handler(sig, frame):
     pid = os.getpid()
     if manager:
         manager.stop()
-        vlog.info('pid: %s Canceled all task!' % pid)
+        tlog.info('pid: %s Canceled all task!' % pid)
     sys.exit(0)
 
 
 signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
-    vlog.info("i'm fine")
+    tlog.info("i'm fine")
     set_start_method('spawn')
 
     # test1()
