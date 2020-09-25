@@ -51,6 +51,11 @@
 
 	_UnixSelectorEventLoop._run_once
 
+		event_list = self._selector.select(timeout)
+		self._process_events(event_list):
+			if selectors.EVENT_READ and reader is not None:
+				self._add_callback(reader), 开始处理读的数据了
+
 		ntodo = len(self._ready)
 			for i in range(ntodo):
 				handle = self._ready.popleft()
@@ -74,8 +79,43 @@
 				self._getters.append(getter)
 				try:
 					await getter
+			每一次 _ready 列表都会弹出一项, 然而这里每次执行后都会增加新的 future
 
 
 	如果遇到 gather 函数, 那么会在 _UnixSelectorEventLoop._ready 中添加多个future, 并运行下一次的 _run_once
 
 	gather 函数本身只是个非 async 函数, 只是它生成了 _GatheringFuture 对象, 含有 children 成员
+
+	executor 给 loop 发io消息: loop._add_callback(reader) --> 让 reader 读消息
+
+
+	await async_func, 直接运行 async_func 函数
+
+	loop.run_in_executor(None, func_name, func_args), 主要运行 workItem, 返回一个 asyncio future
+
+		默认 executor 是一个 concurrent 的线程池
+
+		executor 的 future --> concurrent.futures._base.Future 与 loop 的 new_future --> _asyncio.Future 关联到一起:
+			new_future = loop.create_future()
+			_chain_future(future, new_future):
+
+				destination.add_done_callback(_call_check_cancel)
+				source.add_done_callback(_call_set_state)
+				当 asyncio future 执行回调 _call_check_cancel 时, 会同步更新 concurrent future
+				当 concurrent future 执行回调 _call_set_state 时, 会同步更新 asyncio future
+
+			_copy_future_state(source, dest):
+				result = source.result()
+				dest.set_result(result)
+
+	所以这里在 run_in_executor 中是可以做cpu密集型的工作了
+
+
+	执行 await future 时, 就意味着 要执行下一次 _run_once 了
+
+
+
+	call_soon_threadsafe(callback, *args, context=None):
+		handle = self._call_soon(callback, args, context)
+        self._write_to_self()
+        return handle
