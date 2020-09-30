@@ -11,7 +11,7 @@ title = "web"
     sudo apt-get remove nodejs --purge
 
     # https://github.com/nodesource/distributions
-    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
     sudo apt-get install -y nodejs
 
     node -v
