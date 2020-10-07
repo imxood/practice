@@ -23,6 +23,7 @@ __pycache__
 Pipfile.lock
 .backup
 output*
+out*
 password
 
 

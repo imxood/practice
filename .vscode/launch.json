@@ -5,6 +5,14 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "gdb",
+			"request": "launch",
+			"name": "c++ examples",
+			"target": "./c++/boost/out/test_websocket_client_async.exe",
+			"cwd": "${workspaceRoot}",
+			"valuesFormatting": "parseText"
+		},
+		{
 			"name": "Python: Current File",
 			"type": "python",
 			"request": "launch",
