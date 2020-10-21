@@ -35,3 +35,4 @@ initrd
 package-lock.json
 
 .sconsign.dblite
+.python-version
