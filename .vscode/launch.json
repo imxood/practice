@@ -5,6 +5,14 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo",
+			"executable": "build/oled_demo.elf",
+			"name": "Debug Microcontroller",
+			"request": "launch",
+			"type": "cortex-debug",
+			"servertype": "stutil"
+		},
+		{
 			"type": "gdb",
 			"request": "launch",
 			"name": "c++ examples",
@@ -14,6 +22,7 @@
 		},
 		{
 			"name": "Python: Current File",
+			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo",
 			"type": "python",
 			"request": "launch",
 			"program": "${file}",

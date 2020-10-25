@@ -11,6 +11,7 @@
 out.s
 
 build
+temp
 
 *.pyc
 __pycache__
