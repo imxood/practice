@@ -127,11 +127,23 @@ set_property(
 	"abc:${CMAKE_CURRENT_SOURCE_DIR}/testfile"
 )
 
+# Filesystem
+
+# 把内容输出到文件
 file(GENERATE
     OUTPUT "includes.txt"
     CONTENT "$<TARGET_PROPERTY:test_target,COMPILE_DEFINITIONS>\n"
 )
 
+# 计算给出的文件的sha256
+file(SHA256 ${filename} sum_str)
+
+# 递归删除
+file(REMOVE_RECURSE tools)
+
+# 创建目录, 包含父目录
+file(MAKE_DIRECTORY tools)
+file(COPY tools/ text.txt DESTINATION /tmp)
 
 
 # build chain
