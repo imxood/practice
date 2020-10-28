@@ -877,3 +877,82 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
     修改 IgnoreLid=false 为 IgnoreLid=true
 
     sudo systemctl restart upower.service
+
+## apt-cacher
+
+	sudo apt install apt-cacher
+
+	使用默认的 daemon 方式
+
+	/etc/apt-cacher/apt-cacher.conf:
+		allowed_hosts = *
+
+	systemctl status apt-cacher.service
+	sudo lsof -i:3142
+	ss -tl | grep 3142
+
+	sudo systemctl enable --now apt-cacher
+
+
+##  防火墙
+
+	sudo ufw status
+	sudo ufw enable
+
+	设置默认策略:
+		sudo ufw default allow outgoing
+		sudo ufw default deny incoming
+
+	允许访问:
+
+		开放 ssh 的端口:
+			sudo ufw allow ssh
+
+		允许 tcp/2222 端口:
+			sudo ufw allow 2222/tcp
+
+		允许特定的端口:
+			sudo ufw allow 80/tcp comment 'accept Apache'
+			sudo ufw allow 443/tcp comment 'accept HTTPS connections'
+
+		允许 UDP/1194 (OpenVPN) server:
+			sudo ufw allow 1194/udp comment 'OpenVPN server'
+
+		允许端口范围:
+			sudo ufw allow 3000:4000/tcp
+			sudo ufw allow 3000:4000/udp
+
+		允许ip:
+			sudo ufw allow from 104.22.10.214
+
+		允许 ip为104.22.11.213 端口为25 的 tcp协议:
+			sudo ufw allow from 104.22.11.213 to any port 25 proto tcp
+
+		允许 目的地为 222.222.222.222:
+			sudo ufw allow from 104.22.11.213 to 222.222.222.222 port 25 proto tcp
+
+	拒绝访问:
+
+		sudo ufw deny from 203.5.1.43
+		sudo ufw deny from 103.13.42.13/29
+		sudo ufw deny from 1.1.1.2 to any port 22 proto tcp
+
+	删除rule:
+		sudo ufw status numbered
+		sudo ufw delete 6
+		sudo ufw status numbered
+
+	其它:
+		sudo ufw reset
+		sudo ufw reload
+		sudo more /var/log/ufw.log
+		sudo tail -f /var/log/ufw.log
+		sudo ufw show listening
+		sudo ufw show added
+
+
+## 安装 squid 代理客户端
+
+	sudo apt install squid
+
+	systemctl status squid

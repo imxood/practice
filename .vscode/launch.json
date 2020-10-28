@@ -22,7 +22,6 @@
 		},
 		{
 			"name": "Python: Current File",
-			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo",
 			"type": "python",
 			"request": "launch",
 			"program": "${file}",
