@@ -956,3 +956,12 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 	sudo apt install squid
 
 	systemctl status squid
+
+## ubuntu20 使用 deepin 桌面
+
+    sudo add-apt-repository ppa:ubuntudde-dev/stable
+    sudo apt install ubuntudde-dde
+    
+    选择 display manager 为 gdm3 或者 执行:
+        systemctl status display-manager.service, 查看当前的显示管理器为:  Main PID: 1758 (sddm)
+        sudo dpkg-reconfigure sddm, 选择 gdm3
