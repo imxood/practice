@@ -957,6 +957,18 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 
 	systemctl status squid
 
+
+## 切换 display manager
+
+    先查看当前的dm是:
+        systemctl status display-manager.service
+
+    Main PID: 1018 (sddm) or Main PID: 1018 (gdm3)
+
+    重置:
+        sudo dpkg-reconfigure gdm3
+
+
 ## ubuntu20 使用 deepin 桌面
 
     sudo add-apt-repository ppa:ubuntudde-dev/stable
