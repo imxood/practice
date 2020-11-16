@@ -8,7 +8,14 @@
 
 ## 下载choco
 
-    Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    用administrator执行powershell:
+        Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+    查看是否安装成功:
+        choco --version
+
+    查找软件包:
+        https://chocolatey.org/search
 
 ## 下载LxRunOffline
 
