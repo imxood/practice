@@ -165,3 +165,32 @@
 
     使用:
         openocd -f stmh7_cmsis.cfg -c "flash ()"
+
+## 使用 cmsisdap 调试 stm32
+
+    choco install make openocd gcc-arm-embedded
+
+    创建文件 dap-stm32.cfg, 添加以下内容:
+
+        interface cmsis-dap
+        transport select swd
+        source [find target/stm32f1x.cfg]
+
+    烧写程序:
+        openocd -f ocd-stm32.cfg -c "program build/stm32f103rct6.bin 0x8000000 reset exit"
+
+    打开 launch.json, 新添加一项调试配置:
+
+	{
+		"name": "Cortex Debug",
+		"cwd": "${workspaceRoot}",
+		"executable": "build/stm32f103rct6.elf",
+		"request": "launch",
+		"type": "cortex-debug",
+		"servertype": "openocd",
+		"configFiles": [
+			"dap-stm32.cfg"
+		]
+	}
+
+    必要时, 可以添加 armToolchainPath, 但是 openocd 的路径好像不能添加, 只能设置环境变量

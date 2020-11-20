@@ -237,15 +237,55 @@ sudo apt install obs-studio
 	https://wiki.x2go.org/doku.php/doc:installation:start
 
 	服务端:
+		sudo add-apt-repository ppa:x2go/stable
+		sudo apt-get update
 		sudo apt install x2goserver x2goserver-xsession
 
-	安装后会自动启动服务:
-		systemctl status x2goserver.service
+		安装后会自动启动服务:
+			systemctl status x2goserver.service
+
+		如果 backend 报错:
+
+			设置 backend 为sqlite:
+				vim /etc/x2go/x2gosql/sql, 添加一行:
+					backend=sqlite
+
+			或者使用 PostgreSQL 作为 backend:
+
+				sudo -u postgres psql
+
+				postgres=# alter user postgres with password '123456';
+
+				sudo vim /etc/x2go/x2gosql/passwords/pgadmin, 添加密码:
+					123456
+
+				sudo x2godbadmin --adduser maxu
+
+				sudo x2godbadmin --listuser
+				sudo x2godbadmin --createdb
+
+			重启服务:
+				sudo systemctl start x2goserver.service
+
+			实时查看:
+				sudo journalctl -u x2goserver.service -f
 
 	客户端:
 		sudo apt install x2goclient
 
 		https://wiki.x2go.org/doku.php/doc:installation:x2goclient
+
+
+		如果无法连接, 可以启动debug模式
+
+			服务器端先关掉服务, 然后用debug模式启动:
+				/usr/sbin/x2gocleansessions --debug
+
+		客户端启动debug模式:
+			./x2goclient.debug.exe --debug 或 x2goclient --debug
+
+		遇到过错误:
+			ubuntu20 安装 x2goserver-xsession 时, 少了 /etc/x2go/Xsession, 从cache中的deb文件中解压出一份就可以
 
 ## Typora markdown
 
