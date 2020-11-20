@@ -356,3 +356,8 @@ markdown的瑞士军刀, 支持输出 PDF、EPUB、HTML 幻灯片等多种格式
 ## Cura 3D打印软件
 
 	https://github.com/Ultimaker/Cura
+
+
+## Openpnp 自动贴片
+
+https://openpnp.org

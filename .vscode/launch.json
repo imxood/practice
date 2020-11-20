@@ -7,7 +7,23 @@
 		{
 			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo",
 			"executable": "build/oled_demo.elf",
-			"name": "Debug Microcontroller",
+			"name": "Debug oled_demo",
+			"request": "launch",
+			"type": "cortex-debug",
+			"servertype": "stutil"
+		},
+		{
+			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo_cmake",
+			"executable": "build/f103c8t6_hello.elf",
+			"name": "Debug oled_demo_cmake",
+			"request": "launch",
+			"type": "cortex-debug",
+			"servertype": "stutil"
+		},
+		{
+			"cwd": "${workspaceRoot}/embed/demo/gd32/f103c8t6_hello",
+			"executable": "build/f103c8t6_hello.elf",
+			"name": "Debug f103c8t6_hello",
 			"request": "launch",
 			"type": "cortex-debug",
 			"servertype": "stutil"

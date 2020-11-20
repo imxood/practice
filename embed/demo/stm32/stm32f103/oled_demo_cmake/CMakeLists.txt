@@ -23,7 +23,7 @@ set(LDSCRIPT "${CMAKE_SOURCE_DIR}/STM32F103C8Tx_FLASH.ld")
 set(CMAKE_C_FLAGS "${MCU} -Og -Wno-unused-function -Wall -fdata-sections -ffunction-sections -MMD -MP" CACHE INTERNAL "c compiler flags")
 set(CMAKE_CXX_FLAGS "${MCU} -Og -Wall -fdata-sections -ffunction-sections -MMD -MP" CACHE INTERNAL "cxx compiler flags")
 set(CMAKE_ASM_FLAGS "-Og -Wall -fdata-sections -ffunction-sections" CACHE INTERNAL "asm compiler flags")
-set(CMAKE_EXE_LINKER_FLAGS "-specs=nano.specs -specs=nosys.specs -T${LDSCRIPT} -lc -lm -lnosys -Wl,-Map=output.map,--cref -Wl,--gc-sections" CACHE INTERNAL "exe link flags")
+set(CMAKE_EXE_LINKER_FLAGS "-specs=nano.specs -specs=nosys.specs -lm -T${LDSCRIPT} -Wl,-Map=output.map,--cref -Wl,--gc-sections" CACHE INTERNAL "exe link flags")
 
 
 set(CMAKE_C_FLAGS_DEBUG "-g -gdwarf-2")
@@ -91,4 +91,10 @@ add_custom_command(
 	COMMAND ${CMAKE_SIZE_UTIL} ${EXECUTABLE}
 	COMMAND ${CMAKE_OBJCOPY} -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
 	COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin
+)
+
+add_custom_target(flash
+	DEPENDS ${EXECUTABLE}
+	COMMAND openocd -f ${CMAKE_SOURCE_DIR}/openocd_stm32f1x.cfg
+					-c \"program ${EXECUTABLE} 0x8000000 reset exit\"
 )

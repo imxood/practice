@@ -193,7 +193,7 @@ clean:
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
 
-st-flash: all
+flash: all
 	st-flash write $(BUILD_DIR)/$(TARGET).bin 0x8000000
 
 # *** EOF ***

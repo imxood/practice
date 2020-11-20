@@ -1,5 +1,21 @@
 # openocd笔记
 
+## openocd 编译 安装
+
+    sudo apt install libusb-1.0-0-dev
+
+    git clone https://github.com/ntfreak/openocd.git
+    ./bootstrap
+    ./configure
+    make -j
+    sudo make install
+
+
+## openocd调试stm32f7
+
+    openocd -f board/stm32f7discovery.cfg
+
+
 ## 在linux中当前用户执行openocd， 报错: unable to open CMSIS-DAP device 0xc251:0xf001
 
     sudo vim /etc/udev/rules.d/cmsis-dap.rules, 添加一下内容(记得更改组):
