@@ -401,3 +401,7 @@ markdown的瑞士军刀, 支持输出 PDF、EPUB、HTML 幻灯片等多种格式
 ## Openpnp 自动贴片
 
 https://openpnp.org
+
+## python 库
+
+	jsoncomment, 可以解析带有逗号结尾的json内容
