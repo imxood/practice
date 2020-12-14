@@ -3,3 +3,8 @@
 ## 终端工具
 
     CMDER, http://cmder.net
+
+## 杀死指定进程
+
+    根据名称:
+        taskkill -f -PID ProgessName
