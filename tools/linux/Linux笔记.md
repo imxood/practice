@@ -601,7 +601,9 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 
     查看板卡信息：cat /proc/pci
 
-    查看显卡/声卡信息：lspci |grep -i ‘VGA’[dmesg | grep -i 'VGA']
+    查看显卡/声卡信息
+        lspci | grep -i 'VGA'
+        dmesg | grep -i 'VGA'
 
     查看网卡信息：dmesg | grep -i ‘eth’[cat /etc/sysconfig/hwconf | grep -i eth][lspci | grep -i 'eth']
     <!--more-->
@@ -973,7 +975,20 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 
     sudo add-apt-repository ppa:ubuntudde-dev/stable
     sudo apt install ubuntudde-dde
-    
+
     选择 display manager 为 gdm3 或者 执行:
         systemctl status display-manager.service, 查看当前的显示管理器为:  Main PID: 1758 (sddm)
         sudo dpkg-reconfigure sddm, 选择 gdm3
+
+## ldd, list dynamic dependencyies, 列出动态依赖, 动态库
+
+    比如:
+        maxu@maxu-pc:/develop/sources/stlink/build$ ldd /usr/local/bin/st-info
+        linux-vdso.so.1 (0x00007ffe16f92000)
+        libstlink.so.1 => not found
+        libusb-1.0.so.0 => /lib/x86_64-linux-gnu/libusb-1.0.so.0 (0x00007f469507d000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f4694ebc000)
+        libudev.so.1 => /lib/x86_64-linux-gnu/libudev.so.1 (0x00007f4694e96000)
+        libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f4694e75000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f46950be000)
+        librt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007f4694e6b000)

@@ -400,4 +400,34 @@ markdown的瑞士军刀, 支持输出 PDF、EPUB、HTML 幻灯片等多种格式
 
 ## Openpnp 自动贴片
 
-https://openpnp.org
+	https://openpnp.org
+
+## Sourcetrail 源码阅读工具
+
+	https://github.com/CoatiSoftware/Sourcetrail
+
+## 词典 goldendict
+
+	sudo apt install qt5-default
+
+	sudo apt-get install git pkg-config build-essential qt5-qmake \
+     libvorbis-dev zlib1g-dev libhunspell-dev x11proto-record-dev \
+     qtdeclarative5-dev libxtst-dev liblzo2-dev libbz2-dev \
+     libao-dev libavutil-dev libavformat-dev libtiff5-dev libeb16-dev \
+     libqt5webkit5-dev libqt5svg5-dev libqt5x11extras5-dev qttools5-dev \
+     qttools5-dev-tools qtmultimedia5-dev libqt5multimedia5-plugins
+
+	git clone https://github.com/goldendict/goldendict
+
+	cd goldendict
+	qmake
+	make -j40
+
+	添加欧路在线词典：
+		https://dict.eudic.net/dicts/en/%GDWORD%
+
+	# Google Translate -> [Chinese]
+	trans -e google -s auto -t zh-CN -show-original y -show-original-phonetics n -show-translation y -no-ansi -show-translation-phonetics n -show-prompt-message n -show-languages y -show-original-dictionary n -show-dictionary n -show-alternatives n "%GDWORD%"
+
+	# Google Translate -> [English]
+	trans -e google -s auto -t en-US -show-original y -show-original-phonetics n -show-translation y -no-ansi -show-translation-phonetics n -show-prompt-message n -show-languages y -show-original-dictionary n -show-dictionary n -show-alternatives n "%GDWORD%"
