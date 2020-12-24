@@ -5,6 +5,12 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Cargo launch",
+			"program": "rust/basic/target/debug/basic"
+		},
+		{
 			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo",
 			"executable": "build/oled_demo.elf",
 			"name": "Debug oled_demo",

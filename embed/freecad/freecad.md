@@ -1,5 +1,9 @@
 # freecad 使用笔记
 
+## 通过ppa安装
+
+	sudo add-apt-repository ppa:freecad-maintainers/freecad-stable
+
 ## 源码编译
 
 	sudo apt build-dep freecad

@@ -19,6 +19,6 @@
 git config --global core.autocrlf false
 
 
-## 执行 git status 时 中文乱码解决:
+## 执行 git status 时 中文路径乱码解决:
 
     git config --global core.quotepath false

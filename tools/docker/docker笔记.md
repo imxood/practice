@@ -1,39 +1,46 @@
 # docker的基本使用及技巧
 
+## linux 安装 docker
+
+curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+
+## deepin 安装 docker
+
+sudo apt install docker-ce
+
+## 基本配置
+
+    sudo usermod -aG docker maxu
+
+    sudo apt install -y docker-compose
+
+    加速: curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
+
+    修改镜像默认存储路径
+    vim /etc/docker/daemon.json:
+    {
+        "registry-mirrors": [
+            "....."
+        ]
+        "graph":"/data/docker"
+    }
+
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+
+    sudo docker info
 
 ## docker 图形化
 
     docker pull portainer/portainer
 
-
-## linux安装docker
-
-curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
-
-sudo usermod -aG docker maxu
-
-sudo apt install -y docker-compose
-
-加速: curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
-
-修改镜像默认存储路径
-vim /etc/docker/daemon.json:
-{
-	...
-	"graph":"/data/docker"
-}
-
-
-sudo systemctl restart docker.service
-
-docker info
-
-
 ## 安装Kitematic(docker的gui工具)
 
     https://github.com/docker/kitematic/releases
 
+## aliyun daocker 镜像加速器
 
+    https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
 
 ## docker好用的命令:
 

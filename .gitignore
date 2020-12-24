@@ -13,6 +13,9 @@ out.s
 build
 temp
 
+target
+Cargo.lock
+
 *.pyc
 __pycache__
 

@@ -601,7 +601,7 @@ eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 
     查看板卡信息：cat /proc/pci
 
-    查看显卡/声卡信息
+    查看显卡/声卡信息:
         lspci | grep -i 'VGA'
         dmesg | grep -i 'VGA'
 

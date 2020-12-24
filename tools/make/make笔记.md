@@ -52,3 +52,7 @@ ps: 命令中的[..]代表是可选项, 加了后意义自然有了不同
             $(CC) $^ -o $@.bin
 
         all: $(TARGETS)
+
+# make 函数
+
+    $(filter-out a.cpp, $(SRC)), 从SRC中排除指定的内容
