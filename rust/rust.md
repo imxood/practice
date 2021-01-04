@@ -42,6 +42,26 @@
         rustup self uninstall
 
 
+## 使用特定的 rust 版本
+
+    参考: https://doc.rust-lang.org/edition-guide/rust-2018/rustup-for-managing-rust-versions.html
+
+    rustup toolchain install nightly-2020-11-19
+    rustup toolchain list
+    rustup default nightly-2020-11-19
+
+    ps:
+        "2020-11-19" 这个时间是在 rust 的 git 中的tag上找的
+
+
+    # Install the nightly toolchain
+    rustup toolchain install nightly
+    # Configure your current project to use nightly (run this command within the project)
+    rustup override set nightly
+    # OR configure cargo to use nightly for all projects -- switch back with `rustup default stable`
+    rustup default nightly
+
+
 ## vscode 中 rust 的插件
 
     1. Rust
@@ -104,7 +124,43 @@
     // 如果无法运行, 就安装下面的软件包
     sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
 
+## iced: 编译 并 运行所有的 examples
+
+    #!/bin/bash
+
+    examples=(iced_core iced_futures iced_graphics iced_native iced_style iced_glow iced_glutin iced_winit iced_web iced_wgpu bezier_tool iced clock color_palette counter custom_widget download_progress events game_of_life geometry integration pane_grid pick_list pokedex progress_bar qr_code scrollable solar_system stopwatch styling svg todos tour)
+
+    for example in ${examples[@]}; do
+        cargo build --verbose --package $example
+    done
+
+    for example in ${examples[@]}; do
+        echo "start run: cargo run --verbose --package $example"
+        cargo run --verbose --package $example
+    done
+
+    # # 面板
+    # target/debug/pane_grid
+
+    # # 表单 及 选择主题
+    # target/debug/styling
+
 ### valora
 
     cargo new hello_valora --bin && cd hello_valora
     cargo add valora
+
+## cargo 的进一步用法
+
+    cargo new hello_world <--bin>, 创建一个二进制程序
+    cargo new hello_world --lib, 创建一个库
+
+    练习:
+        git clone https://github.com/rust-lang-nursery/rand.git
+        cd rand
+        cargo build
+
+## bevy
+
+    git clone https://github.com/bevyengine/bevy
+    cargo run --example breakout
