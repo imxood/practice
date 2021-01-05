@@ -139,11 +139,15 @@
         cargo run --verbose --package $example
     done
 
-    # # 面板
-    # target/debug/pane_grid
 
-    # # 表单 及 选择主题
-    # target/debug/styling
+## iced 例子
+
+    学习基本的布局:
+        target/debug/pane_grid
+        examples/tour
+
+    学习canvas:
+        examples/clock
 
 ### valora
 
