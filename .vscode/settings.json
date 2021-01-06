@@ -1,6 +1,5 @@
 {
     "rust-analyzer.linkedProjects": [
-        "rust/hello_bevy/Cargo.toml",
-        "rust/hello_iced/Cargo.toml"
+        "rust/hello_druid/Cargo.toml",
     ]
 }

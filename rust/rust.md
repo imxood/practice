@@ -2,6 +2,13 @@
 
 ## Rust 库 收集
 
+    kurbo
+        曲线工具
+
+    lyon
+        路径细分库, 可以用于基于GPU的2D图形渲染
+
+
     tokio
 
         https://github.com/tokio-rs/tokio
@@ -35,8 +42,9 @@
         rustup default stable
         rustup default nightly
 
-    添加工具 cargo-edit:
+    添加工具:
         cargo install cargo-edit
+        cargo install mdbook
 
     卸载:
         rustup self uninstall
@@ -53,22 +61,22 @@
     ps:
         "2020-11-19" 这个时间是在 rust 的 git 中的tag上找的
 
-
-    # Install the nightly toolchain
+    # 安装 nightly 版本的工具链
     rustup toolchain install nightly
-    # Configure your current project to use nightly (run this command within the project)
+
+    # 对当前项目使用 nightly
     rustup override set nightly
-    # OR configure cargo to use nightly for all projects -- switch back with `rustup default stable`
+
+    # 对所有项目使用 nightly
     rustup default nightly
 
 
 ## vscode 中 rust 的插件
 
-    1. Rust
+    1. rust-analyzer
     2. Crates
     3. Better TOML
     4. CodeLLDB
-    5. rust-analyzer
 
 ## Rust hello_world
 
