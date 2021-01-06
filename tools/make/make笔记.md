@@ -2,6 +2,21 @@
 
 ps: 命令中的[..]代表是可选项, 加了后意义自然有了不同
 
+## 打印变量
+
+    $(warning $(XXX))
+    $(error $(XXX))
+
+## 判断
+
+    ifeq ($(VALIDATION),1)
+    ifdef PLATFORM
+    $(error PLATFORM: $(PLATFORM) defined)
+    else
+    $(error PLATFORM: $(PLATFORM) undefined)
+    endif
+    endif
+
 ## Makefile规则
 
     Targets: Prerequisites[;Command]
