@@ -176,3 +176,11 @@
 
     git clone https://github.com/bevyengine/bevy
     cargo run --example breakout
+
+## libusb
+
+    在windows上找不到libusb库, 在 ~/.cargo/config 中添加:
+
+    [target.x86_64-pc-windows-msvc.'usb-1.0']
+    rustc-link-search = ['D:\libs\64bit']
+    rustc-link-lib = ['libusb-1.0']
