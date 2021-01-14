@@ -15,6 +15,12 @@ fn main() {
                 device_desc.vendor_id(),
                 device_desc.product_id()
             );
+            for index in device_desc.num_configurations() {
+                let config_desc = device.config_descriptor(index).unwrap();
+                for iface in config_desc.interfaces() {
+                    iface.
+                }
+            }
 
             let mut handle = device.open().unwrap();
             println!("Device Opened");
@@ -31,7 +37,7 @@ fn main() {
             println!("Claim Interface!");
 
             let mut endpoint = 0x01;
-            let mut buf = [0x01, 0x02, 0x03, 0x04];
+            let buf = [0x01, 0x02, 0x03, 0x04];
 
             let size = handle
                 .write_bulk(endpoint, &buf[..], Duration::from_secs(5))
