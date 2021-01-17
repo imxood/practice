@@ -1,5 +1,7 @@
 {
     "rust-analyzer.linkedProjects": [
-        "rust/hello_druid/Cargo.toml",
+		"rust/hello_druid/Cargo.toml",
+		"rust/hello_conrod/Cargo.toml",
+		"rust/test_usb/Cargo.toml"
     ]
 }

@@ -8,7 +8,7 @@
 			"type": "lldb",
 			"request": "launch",
 			"name": "Cargo launch",
-			"program": "rust/basic/target/debug/basic"
+			"program": "rust/test_usb/target/debug/test_usb"
 		},
 		{
 			"cwd": "${workspaceRoot}/embed/demo/stm32/stm32f103/oled_demo",
