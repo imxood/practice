@@ -93,7 +93,7 @@ int main(void)
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    const char *str = "hello,world\n";
+    const char *str = "hello,world\r\n";
     while (1)
     {
         CDC_Transmit_FS((uint8_t *)str, strlen(str));
