@@ -81,3 +81,69 @@
 
     #define DT_DRV_COMPAT st_stm32_sdmmc, 访问设备树时, 需要通过 DT_DRV_COMPAT 去访问对应的设备树实例
     DT_DRV_INST(0), 与 DT 相关的DEFINE, 内部都是用 DT_DRV_COMPAT 去拼凑 DEFINE 的
+
+
+### west 命令
+
+    cd zephyrproject/zephyr
+
+    编译:
+        west build -p auto -b stm32f769i_disco samples/hello_world -- -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+    后面参数只需要一次就可以了: west build
+
+    烧写:
+        west flash
+
+### 启用 shell
+
+    CONFIG_SHELL=y
+
+### 使用UART3
+
+     1. 添加自定义 DTS 设备树文件 custom.overlay:
+
+        &usart3 {
+            pinctrl-0 = <&usart3_tx_pb10 &usart3_rx_pb11>;
+            current-speed = <115200>;
+            status = "okay";
+        };
+
+    2. 在 CMakeLists.txt 中, 在 "find_package(Zephyr..." 前 添加:
+       set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/usb.overlay")
+
+    3. 在 prj.conf 中添加:
+        "UART-3"
+        "UART-3"
+
+### 启用 usb
+
+    1. 添加自定义 DTS 设备树文件 usb.overlay:
+        &usbotg_fs {
+            status = "okay";
+        };
+
+    2. 在 CMakeLists.txt 中, 在 "find_package(Zephyr..." 前 添加:
+       set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/usb.overlay")
+
+    3. 在 prj.conf 中添加:
+        CONFIG_USB=y
+        CONFIG_USB_DC_STM32=y
+        CONFIG_USB_CDC_ACM=y
+        CONFIG_USB_DEVICE_STACK=y
+
+    4. 在 main.c 中添加code, 开启USB:
+        static void fn_usb_dc_status_callback(enum usb_dc_status_code cb_status,
+                        const uint8_t *param)
+        {
+            printk("cb_status: %d\n", cb_status);
+        }
+
+        void main(void)
+        {
+            printk("Hello World! %s\n", CONFIG_BOARD);
+            int ret = usb_enable(fn_usb_dc_status_callback);
+            if (ret) {
+                printk("usb enable failed\n");
+            }
+        }
