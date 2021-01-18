@@ -64,23 +64,24 @@
     {
         "name": "Cortex Debug",
         "cwd": "${workspaceRoot}",
-        "executable": "stm32f7_app/build/zephyr/zephyr.elf",
+        "executable": "build/zephyr/zephyr.elf",
         "request": "launch",
         "type": "cortex-debug",
         "servertype": "openocd",
         "configFiles": [
-            "stm32f7_app/boards/arm/stm32f767i_disco/support/openocd.cfg"
-        ],
-        "armToolchainPath": "/develop/programs/gcc-arm-none-eabi-9-2020-q2-update/bin"
+            "board/stm32f7discovery.cfg"
+        ]
     }
 
 ## zephyr 笔记
+
+    zephyr设备树, 详细的介绍: https://docs.zephyrproject.org/latest/reference/devicetree/api.html
 
     stm32f7_app/build/zephyr/zephyr.dts, 编译后的设备树
     stm32f7_app/build/zephyr/include/generated/devicetree_unfixed.h, 根据设备树生成的头文件
 
     #define DT_DRV_COMPAT st_stm32_sdmmc, 访问设备树时, 需要通过 DT_DRV_COMPAT 去访问对应的设备树实例
-    DT_DRV_INST(0), 与 DT 相关的DEFINE, 内部都是用 DT_DRV_COMPAT 去拼凑 DEFINE 的
+    DT_DRV_INST(0)
 
 
 ### west 命令
@@ -110,29 +111,35 @@
         };
 
     2. 在 CMakeLists.txt 中, 在 "find_package(Zephyr..." 前 添加:
-       set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/usb.overlay")
+       set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/custom.overlay")
 
     3. 在 prj.conf 中添加:
-        "UART-3"
-        "UART-3"
+        CONFIG_UART_CONSOLE_ON_DEV_NAME="UART_3"
+        CONFIG_UART_SHELL_ON_DEV_NAME="UART_3"
 
 ### 启用 usb
 
-    1. 添加自定义 DTS 设备树文件 usb.overlay:
+    1. 添加自定义 DTS 设备树文件 custom.overlay:
         &usbotg_fs {
+            pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;
             status = "okay";
         };
 
     2. 在 CMakeLists.txt 中, 在 "find_package(Zephyr..." 前 添加:
-       set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/usb.overlay")
+       set(DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/custom.overlay")
 
     3. 在 prj.conf 中添加:
+
         CONFIG_USB=y
         CONFIG_USB_DC_STM32=y
-        CONFIG_USB_CDC_ACM=y
         CONFIG_USB_DEVICE_STACK=y
 
+        CONFIG_USB_CDC_ACM=y
+
     4. 在 main.c 中添加code, 开启USB:
+
+        #include <usb/usb_device.h>
+
         static void fn_usb_dc_status_callback(enum usb_dc_status_code cb_status,
                         const uint8_t *param)
         {
