@@ -119,6 +119,8 @@
 
 ### 启用 usb
 
+    pinctrl-0 中的配置可以在 devicetree_unfixed.h 中找到
+
     1. 添加自定义 DTS 设备树文件 custom.overlay:
         &usbotg_fs {
             pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;
