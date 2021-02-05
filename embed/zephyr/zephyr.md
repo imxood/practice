@@ -156,3 +156,13 @@
                 printk("usb enable failed\n");
             }
         }
+        
+## trace
+
+    sudo apt-get install lttng-tools
+
+    west build -b native_posix -- -DCONF_FILE=prj_native_posix_ctf.conf
+    ./build/zephyr/zephyr.exe -trace-file=test.ctf
+
+    cp test.ctf zephyr/subsys/tracing/ctf/tsdl
+    babeltrace zephyr/subsys/tracing/ctf/tsdl
