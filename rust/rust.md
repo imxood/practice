@@ -1,33 +1,9 @@
 # Rust 学习笔记
 
-## Rust 库 收集
-
-    kurbo
-        曲线工具
-
-    lyon
-        路径细分库, 可以用于基于GPU的2D图形渲染
-
-
-    tokio
-
-        https://github.com/tokio-rs/tokio
-
-        功能包括:
-
-        fs	fsAsynchronous file and standard stream adaptation.
-        io	Traits, helpers, and type definitions for asynchronous I/O functionality.
-        net	TCP/UDP/Unix bindings for tokio.
-        prelude	A "prelude" for users of the tokio crate.
-        process	processAn implementation of asynchronous process management for Tokio.
-        runtime	rtThe Tokio runtime.
-        signal	signalAsynchronous signal handling for Tokio
-        stream	streamStream utilities for Tokio.
-        sync	syncSynchronization primitives for use in asynchronous contexts.
-        task	Asynchronous green-threads.
-        time	timeUtilities for tracking time.
-
 ## Rust 的 安装与卸载
+
+    参考链接:
+        https://www.rust-lang.org/zh-CN/tools/install
 
     安装:
         curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
@@ -102,6 +78,7 @@
 
     编译 并生成可执行程序:
         cargo build
+        cargo build --release
 
     编译 但不生成 可执行程序:
         cargo check
@@ -109,8 +86,23 @@
     运行目标程序 (也可以一步构建项目):
         cargo run
 
-    发布构建:
-        cargo build --release
+    创建:
+        cargo new hello_world <--bin>, 创建一个二进制程序
+        cargo new hello_world --lib, 创建一个库
+
+
+## 库
+
+    kurbo
+        曲线工具
+
+    lyon
+        路径细分库, 可以用于基于GPU的2D图形渲染
+
+
+    tokio
+
+        https://github.com/tokio-rs/tokio
 
 ## GUI 开发
 
@@ -132,7 +124,7 @@
     // 如果无法运行, 就安装下面的软件包
     sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
 
-## iced: 编译 并 运行所有的 examples
+### iced: 编译 并 运行所有的 examples
 
     #!/bin/bash
 
@@ -148,7 +140,7 @@
     done
 
 
-## iced 例子
+### iced 例子
 
     学习基本的布局:
         target/debug/pane_grid
@@ -157,27 +149,13 @@
     学习canvas:
         examples/clock
 
-### valora
 
-    cargo new hello_valora --bin && cd hello_valora
-    cargo add valora
-
-## cargo 的进一步用法
-
-    cargo new hello_world <--bin>, 创建一个二进制程序
-    cargo new hello_world --lib, 创建一个库
-
-    练习:
-        git clone https://github.com/rust-lang-nursery/rand.git
-        cd rand
-        cargo build
-
-## bevy
+### bevy, 游戏引擎
 
     git clone https://github.com/bevyengine/bevy
     cargo run --example breakout
 
-## libusb
+## libusb, usb库
 
     在windows上找不到libusb库, 在 ~/.cargo/config 中添加:
 

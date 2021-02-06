@@ -18,7 +18,7 @@
 ## arm-none-eabi-gcc 的 "-specs" gcc定义
 
     来自对文档的解读: gcc-arm-none-eabi-9-2020-q2-update/share/doc/gcc-arm-none-eabi/pdf/gcc/gcc.pdf
-        
+
         3.19 Specifying Subprocesses and the Switches to Pass to Them
 
     查看默认的 specs:
@@ -105,3 +105,14 @@
         link_gcc_c_sequence, 先使用原来"link_gcc_c_sequence"定义的 spec string
                              再追加上新的 "--start-group %G %(nosys_libc) %(nosys_libgloss) --end-group"
                              并替换上面已定义的"nosys_libc"和"nosys_libgloss"
+
+
+## gcc 优化
+
+[gcc 优化](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Optimize-Options)
+
+    gcc中指定优化级别的参数有：-O0、-O1、-O2、-O3、-Og、-Os、-Ofast
+
+    默认为 -O0
+
+    -Og 是在 -O1 的基础上，去掉了那些影响调试的优化，所以如果最终是为了调试程序，可以使用这个参数
