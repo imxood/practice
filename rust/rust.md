@@ -12,6 +12,7 @@
         rustc --version
 
     升级:
+        rustup update stable
         rustup update
 
     使用 不同 版本:
