@@ -20,6 +20,7 @@
         rustup default nightly
 
     添加工具:
+        cargo install cargo-generate
         cargo install cargo-edit
         cargo install mdbook
 
@@ -46,6 +47,10 @@
 
     # 对所有项目使用 nightly
     rustup default nightly
+
+## riscv
+
+    rustup target add riscv32imac-unknown-none-elf
 
 
 ## vscode 中 rust 的插件
@@ -102,8 +107,12 @@
 
 
     tokio
-
         https://github.com/tokio-rs/tokio
+
+    embedded_graphics
+        mcu gui
+
+    embedded_sdmmc
 
 ## GUI 开发
 
@@ -163,3 +172,56 @@
     [target.x86_64-pc-windows-msvc.'usb-1.0']
     rustc-link-search = ['D:\libs\64bit']
     rustc-link-lib = ['libusb-1.0']
+
+## wasm 开发
+
+    安装 wasm-pack:
+
+        curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+    cargo install cargo-generate
+
+    cargo generate --git https://github.com/rustwasm/wasm-pack-template -n wasm-app
+
+    cd wasm-app
+    wasm-pack build
+
+    npm init wasm-app www
+
+    cd www
+    yarn
+
+    cd ../pkg
+    yarn link
+
+    cd ../www
+    yarn link "wasm-app"
+
+
+## vue vite rust wasm
+
+    yarn create @vitejs/app my-vue-app --template vue
+
+    cd my-vue-app
+    yarn add -D vite-plugin-rsw
+
+    yarn
+
+    cargo generate --git https://github.com/rustwasm/wasm-pack-template -n wasm-app
+
+    vite.config.js:
+
+        import { defineConfig } from "vite";
+        import vue from "@vitejs/plugin-vue";
+        import ViteRsw from 'vite-plugin-rsw';
+
+        // https://vitejs.dev/config/
+        export default defineConfig({
+            plugins: [
+                vue(),
+                ViteRsw({
+                    mode: "release",
+                    crates: ["wasm-app"],
+                }),
+            ],
+        });
