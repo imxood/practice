@@ -14,8 +14,8 @@
 参考[`flutter 官方教程`](https://flutter.cn/desktop)
 
     设置国内源:
-        export PUB_HOSTED_URL=https://pub.flutter-io.cn
-        export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
+        export PUB_HOSTED_URL=https://mirrors.tuna.tsinghua.edu.cn/dart-pub
+        export FLUTTER_STORAGE_BASE_URL=https://mirrors.tuna.tsinghua.edu.cn/flutter
 
     flutter channel dev
     flutter upgrade
