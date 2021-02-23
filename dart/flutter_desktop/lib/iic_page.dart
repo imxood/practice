@@ -7,39 +7,30 @@ class IicPage extends StatefulWidget {
   _IicPageState createState() => _IicPageState();
 }
 
+class IIcSettings {
+  String addr;
+}
+
 class _IicPageState extends State<IicPage> {
   var isMaster = true;
-  @override
   Widget build(BuildContext context) {
-    var masterBtn = Container(
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(width: 5, color: Colors.red)),
-      ),
-      child: TextButton(
-        child: Text(
-          "Master",
-          style: TextStyle(),
-        ),
-        onPressed: () {
+    var masterBtn = ChoiceChip(
+        selected: isMaster,
+        label: Text('Master'),
+        onSelected: (bool selected) {
           setState(() {
             isMaster = true;
           });
-          print("master view is clicked");
-        },
-      ),
-    );
+        });
 
-    var slaveBtn = Container(
-      child: TextButton(
-        child: Text("Slave"),
-        onPressed: () {
-          print("slave view is clicked");
+    var slaveBtn = ChoiceChip(
+        selected: !isMaster,
+        label: Text('Slave'),
+        onSelected: (bool selected) {
           setState(() {
             isMaster = false;
           });
-        },
-      ),
-    );
+        });
 
     var header = Stack(
       alignment: Alignment.bottomRight,
@@ -60,21 +51,26 @@ class _IicPageState extends State<IicPage> {
         ),
         Wrap(
           children: [
-            Container(
-              child: masterBtn,
-            ),
-            SizedBox(width: 5),
-            Container(
-              child: slaveBtn,
-            ),
+            masterBtn,
+            const SizedBox(width: 8),
+            slaveBtn,
           ],
-        )
+        ),
       ],
     );
 
     var masterView = Container(
       height: 100,
-      child: Text("masterView"),
+      child: Column(
+        children: [
+          Wrap(
+            children: [
+              TextField(),
+              TextField(),
+            ],
+          )
+        ],
+      ),
     );
 
     var slaveView = Container(
