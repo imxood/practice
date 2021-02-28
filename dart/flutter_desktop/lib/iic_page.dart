@@ -63,10 +63,15 @@ class _IicPageState extends State<IicPage> {
       height: 100,
       child: Column(
         children: [
-          Wrap(
+          Row(
             children: [
-              TextField(),
-              TextField(),
+              Text('地址' + ':'),
+              TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: '地址',
+                ),
+              ),
             ],
           )
         ],
@@ -78,19 +83,12 @@ class _IicPageState extends State<IicPage> {
       child: Text("slaveView"),
     );
 
-    var tabView = TabBarView(
-      children: [
-        masterView,
-        slaveView,
-      ],
-    );
-
     return Container(
       height: 400,
       child: Column(
         children: [
           header,
-          if (isMaster) masterView,
+          if (isMaster) masterView else slaveView,
         ],
       ),
     );

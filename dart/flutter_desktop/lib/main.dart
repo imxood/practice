@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:window_size/window_size.dart';
+import './home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +13,7 @@ void main() {
     setWindowMinSize(const Size(1200, 800));
     setWindowMaxSize(Size.infinite);
   }
-//   debugPaintSizeEnabled = true;
+  debugPaintSizeEnabled = true;
   runApp(MyApp());
 }
 
@@ -21,17 +21,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: [
-        // ... app-specific localization delegate[s] here
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       title: 'Material App',
       debugShowCheckedModeBanner: false,
-      home: Text("hello"),
+      home: DemoPage(),
+    );
+  }
+}
+
+class DemoPage extends StatelessWidget {
+  const DemoPage({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: HomePage(),
     );
   }
 }
