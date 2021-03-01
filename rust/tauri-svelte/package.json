@@ -11,6 +11,7 @@
 	},
 	"devDependencies": {
 		"carbon-components-svelte": "^0.29.1",
+		"node-sass": "^5.0.0",
 		"svelte": "^3.34.0",
 		"svelte-hmr": "^0.12.6",
 		"svite": "^0.8.1",
