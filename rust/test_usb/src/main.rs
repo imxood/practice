@@ -7,7 +7,7 @@ fn main() {
 
     for device in context.devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap();
-        if device_desc.vendor_id() == 0x1234 && device_desc.product_id() == 0x1234 {
+        if device_desc.vendor_id() == 0x1234 && device_desc.product_id() == 0x4321 {
             println!(
                 "Bus {:03} Device {:03} ID 0x{:04x}:0x{:04x}",
                 device.bus_number(),
@@ -67,11 +67,11 @@ fn main() {
             handle.claim_interface(iface).unwrap();
             println!("Claim Interface!");
 
-            let endpoint = 0x02;
+            let endpoint = 0x01;
             let buf = [0x03, 0x04];
 
             let size = handle
-                .write_bulk(endpoint, &buf[..], Duration::from_secs(5))
+                .write_interrupt(endpoint, &buf[..], Duration::from_secs(5))
                 .unwrap();
             println!("Write successful, write size: {}", size);
             println!("Handle closed")

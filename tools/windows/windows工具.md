@@ -8,3 +8,7 @@
 
     根据名称:
         taskkill -f -PID ProgessName
+
+## 日志文件
+
+    setupapi.dev.log

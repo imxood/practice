@@ -70,6 +70,9 @@
     # 对所有项目使用 nightly
     rustup default nightly
 
+	# 工具
+	rustup component add clippy
+
 
 ## vscode 中 rust 的插件
 
