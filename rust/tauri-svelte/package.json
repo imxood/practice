@@ -1,0 +1,20 @@
+{
+	"name": "tauri-svelte",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"scripts": {
+		"dev": "svite",
+		"build": "svite build",
+		"tauri:dev": "tauri dev",
+		"tauri:build": "tauri build"
+	},
+	"devDependencies": {
+		"carbon-components-svelte": "^0.29.1",
+		"node-sass": "^5.0.0",
+		"svelte": "^3.34.0",
+		"svelte-hmr": "^0.12.6",
+		"svite": "^0.8.1",
+		"tauri": "^0.14.1"
+	}
+}

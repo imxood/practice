@@ -46,9 +46,15 @@ fn main() {
                     println!("\t\t num_endp: {}", num_endp);
                     for endp_desc in endp.endpoint_descriptors() {
                         println!("\t\t\t endp addr: 0x{:x}", endp_desc.address());
-                        println!("\t\t\t endp transfer type: 0x{:?}", endp_desc.transfer_type());
+                        println!(
+                            "\t\t\t endp transfer type: 0x{:?}",
+                            endp_desc.transfer_type()
+                        );
                         println!("\t\t\t endp transfer dir: {:?}", endp_desc.direction());
-                        println!("\t\t\t endp transfer max package size: 0x{:x}", endp_desc.max_packet_size());
+                        println!(
+                            "\t\t\t endp transfer max package size: 0x{:x}",
+                            endp_desc.max_packet_size()
+                        );
                     }
                 }
             }
@@ -68,6 +74,7 @@ fn main() {
             println!("Claim Interface!");
 
             let endpoint = 0x01;
+
             let buf = [0x03, 0x04];
 
             let size = handle

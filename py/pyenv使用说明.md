@@ -9,7 +9,9 @@
 		eval "$(pyenv init -)"
 
 	由于pyenv是下载python源码 编译, 所以安装会用到的库:
-		sudo apt install libssl-dev libbz2-dev
+		sudo apt-get install -y build-essential libssl-dev zlib1g-dev \
+		libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+		libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 
 		参考: https://github.com/pyenv/pyenv/wiki/Common-build-problems
 

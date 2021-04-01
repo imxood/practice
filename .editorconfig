@@ -14,12 +14,16 @@ indent_style = tab
 [{CMakeLists.txt,*.cmake,Makefile}]
 indent_style = tab
 
-[*.yml]
-indent_style = tab
+[*.{yml,yaml}]
+indent_style = indent
 
 [*.vue]
 indent_style = tab
 
 [*.md]
+indent_style = tab
+indent_size = 4
+
+[*.dart]
 indent_style = tab
 indent_size = 4

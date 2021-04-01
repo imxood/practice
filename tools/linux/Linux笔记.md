@@ -366,12 +366,15 @@ REJECT 拒绝数据包通过，必要时会给数据发送端一个响应的信�
 eyJoaXN0b3J5IjpbMTc2NDcwMTI1NV19
 -->
 
-## apt设置代理
+## apt proxy
 
     sudo vim /etc/apt/apt.conf
     添加(带有分号):
         Acquire::http::proxy "http://127.0.0.1:8123";
         Acquire::https::proxy "https://127.0.0.1:8123";
+
+    或者 安装软件时:
+        sudo apt -o Acquire::http::proxy="http://127.0.0.1:1080" install xxx
 
 ### fdisk
 

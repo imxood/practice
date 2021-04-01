@@ -29,19 +29,21 @@
 			]
 		},
 		{
-			"name": "Python: Special Module",
+			"name": "west",
 			"type": "python",
 			"request": "launch",
-			"cwd": "/home/imxood/develop/sources/zephyrproject/.west/west/src",
-			"pythonPath": "/usr/bin/python3",
+			"cwd": "${env:ZEPHYR_BASE}/../west/src",
 			"stopOnEntry": true,
-			"module": "west.main",
+			"module": "west.app.main",
 			"args": [
-				"--verbose",
-				"flash",
-				"--skip-rebuild",
-				"--build-dir",
-				"~/develop/sources/zephyrproject/zephyr/zephyr_output"
+				"-vvvv",
+				"build",
+				"-b",
+				"stm32f67ig",
+				"../../zephyr_develop/apps/stm32f767ig_app",
+				"--",
+				"-DBOARD_ROOT=../..",
+				"-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 			],
 			"console": "integratedTerminal"
 		},

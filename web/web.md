@@ -6,28 +6,23 @@ title = "web"
 +++
 
 
-### 前端环境
+# 前端环境
 
-    sudo apt-get remove nodejs --purge
+## 使用 nvm 管理nodejs
 
-    # https://github.com/nodesource/distributions
-    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-    sudo apt-get install -y nodejs
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+	nvm install --lts
 
-    node -v
-    npm -v
+	npm config set registry https://registry.npm.taobao.org
+    npm config get registry
 
-    # 升级npm
-    # sudo npm install -g n
-    # sudo n stable
-
-    sudo npm install -g yarn
+    npm install -g yarn
 
     # yarn 配置淘宝源
     yarn config set registry 'https://registry.npm.taobao.org'
 
     # 前端的一个构建工具
-    sudo yarn global add grunt-cli
+    yarn global add grunt-cli
 
     ISSUE: You need to have Ruby and Sass installed and in your PATH for this task to work.
     SOLVED: yarn add --save node-sass grunt-sass

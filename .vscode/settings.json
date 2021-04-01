@@ -1,7 +1,9 @@
 {
-    "rust-analyzer.linkedProjects": [
+	"rust-analyzer.linkedProjects": [
 		"rust/hello_druid/Cargo.toml",
 		"rust/hello_bevy/Cargo.toml",
-		"rust/test_usb/Cargo.toml"
-    ]
+		"rust/test_usb/Cargo.toml",
+		"rust/basic/Cargo.toml",
+		"rust/tauri/src-tauri/Cargo.toml",
+	]
 }
